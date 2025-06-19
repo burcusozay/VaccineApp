@@ -8,8 +8,8 @@ namespace VaccineApp.Business.Interfaces
         Task<string> CreateAccessTokenAsync(UserDto user);
         Task<LoginResponseDto> LoginAsync(LoginRequestDto user);
         Task<RefreshTokenDto?> CreateRefreshTokenAsync(RefreshTokenRequestDto token);
-        Task<RefreshTokenDto?> ValidateRefreshTokenAsync(long userId, string refreshToken);
-        Task InvalidateRefreshTokenAsync(long userId, string refreshToken);
-        Task StoreRefreshTokenAsync(long userId, RefreshTokenDto refreshToken);
+        Task<RefreshTokenDto?> ValidateRefreshTokenAsync(RefreshTokenRequestDto token);
+        Task InvalidateRefreshTokenAsync(RefreshTokenRequestDto token);
+        Task StoreRefreshTokenAsync(RefreshTokenDto refreshToken);
     }
 }

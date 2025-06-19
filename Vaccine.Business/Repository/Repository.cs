@@ -39,6 +39,7 @@ namespace VaccineApp.Business.Repository
         public async Task<T> InsertAsync(T entity)
         {
             await _entities.AddAsync(entity);
+          
             return entity;
         }
 

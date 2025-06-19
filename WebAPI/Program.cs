@@ -28,12 +28,22 @@ public class Program
 
         builder.Services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-        //builder.Services.AddScoped<UnitOfWorkTransactionFilter>();
         builder.Services.AddScoped<AuditActionFilter>();
         builder.Services.AddHttpContextAccessor(); // Username alabilmek icin
         builder.Services.AddAutoMapper(typeof(AutoMappingProfile));
 
         builder.Services.UseRegister();
+
+        var allowedOrigins = builder.Configuration["AllowedOrigins"]?.Split(",") ?? new[] { "*" };
+        builder.Services.AddCors(options =>
+        {
+            options.AddDefaultPolicy(policy =>
+            {
+                policy.WithOrigins(allowedOrigins)
+                      .AllowAnyHeader()
+                      .AllowAnyMethod();
+            });
+        });
 
         // Add services to the container.
         builder.Services.AddControllers(options =>
@@ -98,7 +108,8 @@ public class Program
             app.UseSwaggerUI(options => { options.SwaggerEndpoint("/swagger/v1/swagger.json", "Vaccine API"); });
         }
         app.UseHttpsRedirection();
-        app.UseMiddleware<TransactionMiddleware>(); // EKLENDI
+        app.UseMiddleware<TransactionMiddleware>();
+        app.UseCors();
         app.UseAuthentication(); // Auth middleware aktif edilmeli
         app.UseAuthorization();
         app.MapControllers();

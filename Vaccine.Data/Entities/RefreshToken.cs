@@ -14,7 +14,7 @@ namespace VaccineApp.Data.Entities
         public string? ReplacedByToken { get; set; }
         public bool IsActive => Revoked == null && !IsExpired;
 
-        public int UserId { get; set; }
+        public long UserId { get; set; }
         public User User { get; set; }
     }
 }

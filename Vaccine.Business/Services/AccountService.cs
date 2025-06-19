@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -11,6 +12,8 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.Xml;
 using System.Text;
 using VaccineApp.Business.Interfaces;
+using VaccineApp.Business.Repository;
+using VaccineApp.Business.UnitOfWork;
 using VaccineApp.Data.Entities;
 using VaccineApp.ViewModel.Dtos;
 using VaccineApp.ViewModel.Options;
@@ -20,11 +23,13 @@ namespace VaccineApp.Business.Services
     public class AccountService : IAccountService
     {
         private readonly ILogger<AuditService> _logger;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IDistributedCache _redis;
         private readonly IUserService _userService;
         private readonly IHttpContextAccessor _httpContext;
         private readonly JWTSettingOptions _jwtSettings;
-        public AccountService(IOptions<JWTSettingOptions> jwtSetting, IDistributedCache redis, IHttpContextAccessor httpContext,
+        private readonly IRepository<RefreshToken, long> _refreshTokenRepo;
+        public AccountService(IUnitOfWork unitOfWork, IOptions<JWTSettingOptions> jwtSetting, IDistributedCache redis, IHttpContextAccessor httpContext,
             IUserService userService,
             ILogger<AuditService> logger)
         {
@@ -33,6 +38,8 @@ namespace VaccineApp.Business.Services
             _redis = redis;
             _httpContext = httpContext;
             _userService = userService;
+            _unitOfWork = unitOfWork;
+            _refreshTokenRepo =_unitOfWork.GetRepository<RefreshToken, long>();
         }
 
         public async Task<LoginResponseDto> LoginAsync(LoginRequestDto request)
@@ -76,15 +83,18 @@ namespace VaccineApp.Business.Services
                 return null;
 
             request.Ip = _httpContext.HttpContext.Connection.RemoteIpAddress.ToString() ?? "local";
+            request.UserId = user.Id; 
 
-            var existingToken = await ValidateRefreshTokenAsync(request.UserId, request.AccessToken);
+            var existingToken = await ValidateRefreshTokenAsync(request);
             if (existingToken != null && existingToken.CreatedByIp != request.Ip)
                 return null;
 
             var newRefreshToken = await GenerateRefreshTokenAsync();
             newRefreshToken.AccessToken = request.AccessToken;
+            newRefreshToken.UserId = user.Id;
+
             // Yeni refresh token'ı kaydet
-            await StoreRefreshTokenAsync(request.UserId, newRefreshToken);
+            await StoreRefreshTokenAsync(newRefreshToken);
 
 
             return new RefreshTokenDto()
@@ -100,9 +110,9 @@ namespace VaccineApp.Business.Services
         }
 
         // Refresh token geçerli mi kontrol et
-        public async Task<RefreshTokenDto?> ValidateRefreshTokenAsync(long userId, string accessToken)
+        public async Task<RefreshTokenDto?> ValidateRefreshTokenAsync(RefreshTokenRequestDto refreshToken)
         {
-            var key = $"refresh:{userId}:{accessToken}";
+            var key = $"refresh:{refreshToken.UserId}:{refreshToken.AccessToken}";
             var json = await _redis.GetStringAsync(key);
             if (string.IsNullOrEmpty(json))
                 return null;
@@ -115,9 +125,11 @@ namespace VaccineApp.Business.Services
         }
 
         // Refresh token Redis'e kaydet
-        public async Task StoreRefreshTokenAsync(long userId, RefreshTokenDto refreshToken)
+        public async Task StoreRefreshTokenAsync(RefreshTokenDto refreshToken)
         {
-            var key = $"refresh:{userId}:{refreshToken.AccessToken}";
+            await SaveRefreshTokenToDbAsync(refreshToken);
+
+            var key = $"refresh:{refreshToken.UserId}:{refreshToken.AccessToken}";
             var options = new DistributedCacheEntryOptions
             {
                 AbsoluteExpiration = refreshToken.Expires
@@ -127,9 +139,9 @@ namespace VaccineApp.Business.Services
             await _redis.SetStringAsync(key, json, options);
         }
 
-        public async Task InvalidateRefreshTokenAsync(long userId, string refreshToken)
+        public async Task InvalidateRefreshTokenAsync(RefreshTokenRequestDto refreshToken)
         {
-            var key = $"refresh:{userId}:{refreshToken}";
+            var key = $"refresh:{refreshToken.UserId}:{refreshToken.AccessToken}";
             await _redis.RemoveAsync(key);
         }
 
@@ -167,5 +179,22 @@ namespace VaccineApp.Business.Services
                 signingCredentials: creds
             );
         }
+        private async Task SaveRefreshTokenToDbAsync(RefreshTokenDto dto)
+        {
+            var entity = new RefreshToken
+            {
+                UserId = dto.UserId,
+                Token = dto.RefreshToken,
+                Created = DateTime.UtcNow,
+                CreatedByIp = dto.CreatedByIp,
+                Expires = dto.Expires,
+                ReplacedByToken = dto.ReplacedByToken,
+                Revoked = dto.Revoked,
+                RevokedByIp = dto.RevokedByIp
+            };
+
+            await _refreshTokenRepo.InsertAsync(entity);
+        }
+
     }
 }
