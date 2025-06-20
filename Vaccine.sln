@@ -31,7 +31,19 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Vaccine.Web", "Vaccine.Web\
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
 		VWDPort = "62952"
+		SlnRelativePath = "Vaccine.Web\"
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3A69458C-7D24-4793-9B5F-01750C0FCCFB}"
+	ProjectSection(SolutionItems) = preProject
+		VaccineDB Exam Work.docx = VaccineDB Exam Work.docx
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VaccineApp.SoketPublisher", "VaccineApp.SoketPublisher\VaccineApp.SoketPublisher.csproj", "{61E2C5AD-2579-479C-8147-495037C48E06}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VaccineApp.SoketListener", "Vaccine.SoketListener\VaccineApp.SoketListener.csproj", "{D11BD4C5-DFCB-4D9F-A89F-2A5B085D705B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VaccineApp.RabbitMqConsumer", "Vaccine.RabbitMqConsumer\VaccineApp.RabbitMqConsumer.csproj", "{1D78B0A8-9215-4918-8C16-C543B397C2F9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +75,18 @@ Global
 		{FDCC545B-F4F8-432A-8DC4-517C6F8F5268}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FDCC545B-F4F8-432A-8DC4-517C6F8F5268}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{FDCC545B-F4F8-432A-8DC4-517C6F8F5268}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{61E2C5AD-2579-479C-8147-495037C48E06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61E2C5AD-2579-479C-8147-495037C48E06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61E2C5AD-2579-479C-8147-495037C48E06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61E2C5AD-2579-479C-8147-495037C48E06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D11BD4C5-DFCB-4D9F-A89F-2A5B085D705B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D11BD4C5-DFCB-4D9F-A89F-2A5B085D705B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D11BD4C5-DFCB-4D9F-A89F-2A5B085D705B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D11BD4C5-DFCB-4D9F-A89F-2A5B085D705B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D78B0A8-9215-4918-8C16-C543B397C2F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D78B0A8-9215-4918-8C16-C543B397C2F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D78B0A8-9215-4918-8C16-C543B397C2F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D78B0A8-9215-4918-8C16-C543B397C2F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
