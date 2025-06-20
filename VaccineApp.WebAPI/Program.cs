@@ -18,7 +18,9 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddDbContext<AppDbContext>(options =>
-            options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection")));
+            options
+            .UseLazyLoadingProxies()
+            .UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection")));
 
         // Redis (IDistributedCache icin StackExchange Redis kullanimi)
         builder.Services.AddStackExchangeRedisCache(options =>

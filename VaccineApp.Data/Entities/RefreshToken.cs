@@ -15,6 +15,6 @@ namespace VaccineApp.Data.Entities
         public new bool IsActive => Revoked == null && !IsExpired;
 
         public Guid UserId { get; set; }
-        public User User { get; set; }
+        public virtual User User { get; set; }
     }
 }

@@ -15,6 +15,6 @@ public class VaccineOrder : BaseEntity<long>
     public int VaccineOrderCount { get; set; }
 
     public virtual FreezerStock FreezerStock { get; set; } = null!;
-
+    
     public virtual User User { get; set; } = null!;
 }

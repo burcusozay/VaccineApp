@@ -61,7 +61,9 @@ namespace VaccineApp.Business.Services
                 AccessToken = accessToken,
                 RefreshToken = refreshToken.RefreshToken,
                 ExpirationTime = refreshToken.Expires,
-                Username = user.Username
+                Username = user.Username,
+                Role = user.Role,
+                Roles = user.Roles
             };
         }
 
@@ -73,7 +75,7 @@ namespace VaccineApp.Business.Services
 
         public async Task<RefreshTokenDto?> CreateRefreshTokenAsync(RefreshTokenRequestDto request)
         {
-            if (string.IsNullOrEmpty(request.AccessToken) || (request.UserId != Guid.Empty) )
+            if (string.IsNullOrEmpty(request.AccessToken) || (request.UserId == Guid.Empty) )
                 return null;
 
             // Yeni token üret

@@ -71,8 +71,8 @@ namespace VaccineApp.RabbitMqConsumer
                                 throw new Exception($"Could not communicate to WebAPI ex:{ex}");
                             }
 
-                            _consecutiveOverFive[queeData.Id] = 0; // alarm sonrasý sayaç sýfýrlanýr
                             Console.WriteLine($"alarm id: {queeData.Id}, count:{_consecutiveOverFive[queeData.Id]}");
+                            _consecutiveOverFive[queeData.Id] = 0; // alarm sonrasý sayaç sýfýrlanýr
                         }
                     }
                 }

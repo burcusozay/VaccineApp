@@ -9,7 +9,8 @@ namespace VaccineApp.Business.AutoMapper
         public AutoMappingProfile()
         {
             CreateMap<User, UserDto>()
-                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.UserRoles.FirstOrDefault().Role.Name));
+                  .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.UserRoles.Select(x => x.Role.Name).FirstOrDefault()))
+                  .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.UserRoles.Select(ur => ur.Role.Name).ToList()));
             CreateMap<UserDto, User>();
             CreateMap<UserRole, UserRoleDto>().ReverseMap();
             CreateMap<Role, RoleDto>().ReverseMap();
