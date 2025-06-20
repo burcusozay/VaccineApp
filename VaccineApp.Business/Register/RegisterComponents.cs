@@ -8,12 +8,12 @@ namespace VaccineApp.Business.Register
 {
     public static class RegisterComponents
     {
-        public static void UseRegister(this IServiceCollection services)
+        public static void AddComponents(this IServiceCollection services)
         { 
             #region Main Module Services
             services.AddTransient<IFreezerStockService, FreezerStockService>();
             //services.AddTransient<IFreezerService, FreezerService>();
-            //services.AddTransient<IFreezerTempratureService, FreezerTempratureService>();
+            services.AddTransient<IFreezerTempratureService, FreezerTempratureService>();
             //services.AddTransient<IVaccineService, VaccineService>();
             //services.AddTransient<IVaccineFreezerService, VaccineFreezerService>();
             //services.AddTransient<IVaccineOrderService, VaccineFreezerService>();

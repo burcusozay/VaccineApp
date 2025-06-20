@@ -7,16 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Vaccine.Data\VaccineApp.Data.csproj" />
-    <ProjectReference Include="..\Vaccine.ViewMode\VaccineApp.ViewModel.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="14.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.6" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.3.1" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.3.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\VaccineApp.Data\VaccineApp.Data.csproj" />
+    <ProjectReference Include="..\VaccineApp.ViewModel\VaccineApp.ViewModel.csproj" />
   </ItemGroup>
 
 </Project>

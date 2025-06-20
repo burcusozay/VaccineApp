@@ -17,7 +17,7 @@ namespace WebAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetFreezerTemprature(int id)
         {
-            var stock = await _tempratureService.GetStockByIdAsync(id);
+            var stock = await _tempratureService.GetTempratureByIdAsync(id);
             if (stock == null)
                 return NotFound();
 
@@ -27,7 +27,7 @@ namespace WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateFreezerStock([FromBody] FreezerTempratureDto model)
         {
-            var created = await _tempratureService.AddStockAsync(model);
+            var created = await _tempratureService.AddTempratureAsync(model);
             return CreatedAtAction(nameof(GetFreezerTemprature), new { id = created.Id }, created);
         }
     }

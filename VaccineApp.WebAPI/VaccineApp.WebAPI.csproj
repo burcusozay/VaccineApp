@@ -21,8 +21,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Vaccine.Business\VaccineApp.Business.csproj" />
-    <ProjectReference Include="..\Vaccine.Data\VaccineApp.Data.csproj" />
+    <ProjectReference Include="..\VaccineApp.Business\VaccineApp.Business.csproj" />
+    <ProjectReference Include="..\VaccineApp.Data\VaccineApp.Data.csproj" />
+    <ProjectReference Include="..\VaccineApp.ViewModel\VaccineApp.ViewModel.csproj" />
   </ItemGroup>
 
 </Project>

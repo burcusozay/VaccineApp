@@ -2,7 +2,7 @@
 {
     public class FreezerTempratureDto
     {
-        public long id { get; set; }
+        public long Id { get; set; }
 
         public long FreezerId { get; set; }
 

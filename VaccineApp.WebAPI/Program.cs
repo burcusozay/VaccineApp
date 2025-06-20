@@ -32,7 +32,7 @@ public class Program
         builder.Services.AddHttpContextAccessor(); // Username alabilmek icin
         builder.Services.AddAutoMapper(typeof(AutoMappingProfile));
 
-        builder.Services.UseRegister();
+        builder.Services.AddComponents();
 
         var allowedOrigins = builder.Configuration["AllowedOrigins"]?.Split(",") ?? new[] { "*" };
         builder.Services.AddCors(options =>
