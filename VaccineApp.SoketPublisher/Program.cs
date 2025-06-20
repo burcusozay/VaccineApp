@@ -30,7 +30,7 @@ namespace VaccineApp.SoketPublisher
                 var data = new
                 {
                     Id = rnd.Next(1, 3),
-                    Value = rnd.Next(-20, 11)
+                    Value = decimal.Parse(rnd.Next(-20, 11).ToString())
                 };
                 var msg = JsonSerializer.Serialize(data) + "\n";
                 var bytes = Encoding.UTF8.GetBytes(msg);

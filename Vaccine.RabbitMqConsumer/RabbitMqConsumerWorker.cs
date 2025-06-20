@@ -2,6 +2,7 @@ using Microsoft.Extensions.Options;
 using Npgsql;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using VaccineApp.Core.Core;
@@ -11,15 +12,13 @@ namespace VaccineApp.RabbitMqConsumer
 {
     public class RabbitMqConsumerWorker : BackgroundService
     {
-        private readonly ILogger<RabbitMqConsumerWorker> _logger;
-        private readonly string _pgConnStr;
-        private Dictionary<int, int> consecutiveOverFive;
+        private readonly ILogger<RabbitMqConsumerWorker> _logger; 
+        private Dictionary<long, decimal> consecutiveOverFive;
 
-        public RabbitMqConsumerWorker(ILogger<RabbitMqConsumerWorker> logger, IOptions<PostgreSqlOptions> pgOptions)
+        public RabbitMqConsumerWorker(ILogger<RabbitMqConsumerWorker> logger)
         {
-            _logger = logger;
-            _pgConnStr = pgOptions.Value.PostgreSqlConnection;
-            consecutiveOverFive = new Dictionary<int, int>();
+            _logger = logger; 
+            consecutiveOverFive = new Dictionary<long, decimal>();
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -35,17 +34,9 @@ namespace VaccineApp.RabbitMqConsumer
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
                 var queeData = JsonSerializer.Deserialize<QueeData>(message);
-
-                // PostgreSQL insert
-                //using var pgConn = new NpgsqlConnection(_pgConnStr);
-                //await pgConn.OpenAsync();
-                //using var cmd = new NpgsqlCommand("INSERT INTO sensor_data(sensor_id, value) VALUES(@sensor_id, @value)", pgConn);
-                //cmd.Parameters.AddWithValue("sensor_id", sensorData.id);
-                //cmd.Parameters.AddWithValue("value", sensorData.value);
-                //await cmd.ExecuteNonQueryAsync();
-
+                               
                 // Alarm logic
-                if (queeData.Value > 5)
+                if (queeData != null && queeData.Value > 5)
                 {
                     if (!consecutiveOverFive.ContainsKey(queeData.Id))
                     {
@@ -57,6 +48,20 @@ namespace VaccineApp.RabbitMqConsumer
 
                         if (consecutiveOverFive[queeData.Id] >= 5)
                         {
+
+                            // ALARM DURUMUNDA WEB API'YE HTTP POST AT
+                            using var httpClient = new HttpClient();
+                            var freezerTemp = new
+                            {
+                                FreezerId = queeData.Id,
+                                Temperature = queeData.Value,
+                                CreatedDate = DateTime.UtcNow
+                            };
+
+                            // API adresini kendine göre deðiþtir!
+                            var response = await httpClient.PostAsJsonAsync("https://localhost:44395/api/FreezerTemperature", freezerTemp);
+                            response.EnsureSuccessStatusCode();
+ 
                             Console.WriteLine($"alarm id: {queeData.Id}, count:{consecutiveOverFive[queeData.Id]}");
                         }
                     }
@@ -67,8 +72,7 @@ namespace VaccineApp.RabbitMqConsumer
 
             // Sonsuz bekleme
             //return Task.Delay(-1, stoppingToken);
-            await Task.Delay(Timeout.Infinite, stoppingToken); // Hata veren satýrýn düzeltilmiþ hali
-
+            await Task.Delay(Timeout.Infinite, stoppingToken); // Hata veren satýrýn düzeltilmiþ hali 
         }
     }
 }

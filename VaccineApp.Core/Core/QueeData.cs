@@ -8,7 +8,7 @@ namespace VaccineApp.Core.Core
 {
     public class QueeData
     {
-        public int Id { get; set; }
-        public int Value { get; set; }
+        public long Id { get; set; }
+        public decimal Value { get; set; }
     }
 }

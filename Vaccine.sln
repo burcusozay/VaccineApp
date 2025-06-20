@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35514.174
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAPI", "WebAPI\WebAPI.csproj", "{BFD1327D-A54F-4115-854F-6759C2C42ED2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VaccineApp.WebAPI", "WebAPI\VaccineApp.WebAPI.csproj", "{BFD1327D-A54F-4115-854F-6759C2C42ED2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VaccineApp.Business", "Vaccine.Business\VaccineApp.Business.csproj", "{F5F00A5D-4D07-4906-A1D0-52E546DDF707}"
 EndProject
@@ -12,27 +12,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VaccineApp.ViewModel", "Vaccine.ViewMode\VaccineApp.ViewModel.csproj", "{24A8912E-FEB4-4986-A0BF-D47D7E8B6C8E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VaccineApp.Core", "VaccineApp.Core\VaccineApp.Core.csproj", "{1794903D-C8D9-4CFF-A4DB-E8D5739E9ECC}"
-EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Vaccine.Web", "Vaccine.Web\", "{FDCC545B-F4F8-432A-8DC4-517C6F8F5268}"
-	ProjectSection(WebsiteProperties) = preProject
-		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
-		Debug.AspNetCompiler.VirtualPath = "/localhost_62952"
-		Debug.AspNetCompiler.PhysicalPath = "Vaccine.Web\"
-		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_62952\"
-		Debug.AspNetCompiler.Updateable = "true"
-		Debug.AspNetCompiler.ForceOverwrite = "true"
-		Debug.AspNetCompiler.FixedNames = "false"
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.VirtualPath = "/localhost_62952"
-		Release.AspNetCompiler.PhysicalPath = "Vaccine.Web\"
-		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_62952\"
-		Release.AspNetCompiler.Updateable = "true"
-		Release.AspNetCompiler.ForceOverwrite = "true"
-		Release.AspNetCompiler.FixedNames = "false"
-		Release.AspNetCompiler.Debug = "False"
-		VWDPort = "62952"
-		SlnRelativePath = "Vaccine.Web\"
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3A69458C-7D24-4793-9B5F-01750C0FCCFB}"
 	ProjectSection(SolutionItems) = preProject
@@ -44,6 +23,26 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VaccineApp.SoketListener", "Vaccine.SoketListener\VaccineApp.SoketListener.csproj", "{D11BD4C5-DFCB-4D9F-A89F-2A5B085D705B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VaccineApp.RabbitMqConsumer", "Vaccine.RabbitMqConsumer\VaccineApp.RabbitMqConsumer.csproj", "{1D78B0A8-9215-4918-8C16-C543B397C2F9}"
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "VaccineApp.Web", "VaccineApp.Web\", "{0D02EE26-7510-4923-8FC1-37E00B90D3B7}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_61621"
+		Debug.AspNetCompiler.PhysicalPath = "VaccineApp.Web\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_61621\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_61621"
+		Release.AspNetCompiler.PhysicalPath = "VaccineApp.Web\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_61621\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "61621"
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,10 +70,6 @@ Global
 		{1794903D-C8D9-4CFF-A4DB-E8D5739E9ECC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1794903D-C8D9-4CFF-A4DB-E8D5739E9ECC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1794903D-C8D9-4CFF-A4DB-E8D5739E9ECC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FDCC545B-F4F8-432A-8DC4-517C6F8F5268}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FDCC545B-F4F8-432A-8DC4-517C6F8F5268}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FDCC545B-F4F8-432A-8DC4-517C6F8F5268}.Release|Any CPU.ActiveCfg = Debug|Any CPU
-		{FDCC545B-F4F8-432A-8DC4-517C6F8F5268}.Release|Any CPU.Build.0 = Debug|Any CPU
 		{61E2C5AD-2579-479C-8147-495037C48E06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{61E2C5AD-2579-479C-8147-495037C48E06}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{61E2C5AD-2579-479C-8147-495037C48E06}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -87,6 +82,10 @@ Global
 		{1D78B0A8-9215-4918-8C16-C543B397C2F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1D78B0A8-9215-4918-8C16-C543B397C2F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1D78B0A8-9215-4918-8C16-C543B397C2F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D02EE26-7510-4923-8FC1-37E00B90D3B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D02EE26-7510-4923-8FC1-37E00B90D3B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D02EE26-7510-4923-8FC1-37E00B90D3B7}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D02EE26-7510-4923-8FC1-37E00B90D3B7}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
