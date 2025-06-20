@@ -4,7 +4,7 @@ namespace VaccineApp.Data.Entities;
 
 public class VaccineOrder : BaseEntity<long>
 { 
-    public long UserId { get; set; }
+    public Guid UserId { get; set; }
 
     public long FreezerStockId { get; set; }
 

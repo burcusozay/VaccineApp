@@ -14,9 +14,11 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<FreezerStock> FreezerStocks { get; set; }
 
-    public virtual DbSet<FreezerTemprature> FreezerTempratures { get; set; }
+    public virtual DbSet<FreezerTemperature> FreezerTemperatures { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
+    public virtual DbSet<Role> Roles { get; set; }
+    public virtual DbSet<UserRole> UserRoles { get; set; }
 
     public virtual DbSet<Vaccine> Vaccines { get; set; }
 
@@ -50,36 +52,64 @@ public partial class AppDbContext : DbContext
                 .HasConstraintName("FreezerStockVaccine_Freezers_fk");
         });
 
-        modelBuilder.Entity<FreezerTemprature>(entity =>
+        modelBuilder.Entity<FreezerTemperature>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("FreezerTempratures_pk");
+            entity.HasKey(e => e.Id).HasName("FreezerTemperatures_pk");
 
             entity.Property(e => e.Id).UseIdentityAlwaysColumn();
-            entity.Property(e => e.Temprature).HasPrecision(5, 2);
+            entity.Property(e => e.Temperature).HasPrecision(5, 2);
 
-            entity.HasOne(d => d.Freezer).WithMany(p => p.FreezerTempratures)
+            entity.HasOne(d => d.Freezer).WithMany(p => p.FreezerTemperatures)
                 .HasForeignKey(d => d.FreezerId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FreezerTempraturesFreezers_fk");
+                .HasConstraintName("FreezerTemperaturesFreezers_fk");
         });
 
         modelBuilder.Entity<User>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("Users_pk");
 
-            entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+            //entity.Property(e => e.Id).UseIdentityAlwaysColumn();
             entity.Property(e => e.Address).HasColumnType("character varying");
             entity.Property(e => e.Name).HasColumnType("character varying");
-            entity.Property(e => e.Phone).HasColumnType("character varying");
+            entity.Property(e => e.PhoneNumber).HasColumnType("character varying");
             entity.Property(e => e.Surname).HasColumnType("character varying");
             entity.Property(e => e.Username).HasColumnType("character varying");
+        });       
+        
+        modelBuilder.Entity<Role>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("Roles_pk");
+
+            //entity.Property(e => e.Id).UseIdentityAlwaysColumn(); 
+            entity.Property(e => e.Name).HasColumnType("character varying");
+            entity.Property(e => e.NormalizedName).HasColumnType("character varying");
+            entity.Property(e => e.Description).HasColumnType("character varying"); 
+        });
+
+        modelBuilder.Entity<UserRole>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("UserRoles_pk");
+
+            //entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserRoles)
+               .HasForeignKey(d => d.UserId)
+               .OnDelete(DeleteBehavior.ClientSetNull)
+               .HasConstraintName("UserRoles_Users_fk");
+
+            entity.HasOne(d => d.Role).WithMany(p => p.UserRoles)
+               .HasForeignKey(d => d.RoleId)
+               .OnDelete(DeleteBehavior.ClientSetNull)
+               .HasConstraintName("UserRoles_Roles_fk");
         });
 
         modelBuilder.Entity<Vaccine>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("Vaccines_pk");
-
+            entity.HasKey(e => e.Id).HasName("Vaccines_pk"); 
             entity.HasIndex(e => e.Id, "VaccinesId_idx");
+
+            entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
             entity.Property(e => e.Id).UseIdentityAlwaysColumn();
             entity.Property(e => e.CompanyName).HasColumnType("character varying");

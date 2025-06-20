@@ -6,13 +6,9 @@ public class Freezer : BaseEntity<long>
 {
     public string Name { get; set; } = null!;
 
-    public bool IsActive { get; set; }
-
-    public bool IsDeleted { get; set; }
-
     public int OrderNo { get; set; }
 
-    public virtual ICollection<FreezerTemprature> FreezerTempratures { get; set; } = new List<FreezerTemprature>();
+    public virtual ICollection<FreezerTemperature> FreezerTemperatures { get; set; } = new List<FreezerTemperature>();
 
     public virtual ICollection<VaccineFreezer> VaccineFreezers { get; set; } = new List<VaccineFreezer>();
 }

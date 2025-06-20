@@ -13,7 +13,7 @@ namespace VaccineApp.Business.Register
             #region Main Module Services
             services.AddTransient<IFreezerStockService, FreezerStockService>();
             //services.AddTransient<IFreezerService, FreezerService>();
-            services.AddTransient<IFreezerTempratureService, FreezerTempratureService>();
+            services.AddTransient<IFreezerTemperatureService, FreezerTemperatureService>();
             //services.AddTransient<IVaccineService, VaccineService>();
             //services.AddTransient<IVaccineFreezerService, VaccineFreezerService>();
             //services.AddTransient<IVaccineOrderService, VaccineFreezerService>();

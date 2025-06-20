@@ -8,14 +8,18 @@ namespace VaccineApp.Business.AutoMapper
     {
         public AutoMappingProfile()
         {
-            CreateMap<User, UserDto>().ReverseMap();
+            CreateMap<User, UserDto>()
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.UserRoles.FirstOrDefault().Role.Name));
+            CreateMap<UserDto, User>();
+            CreateMap<UserRole, UserRoleDto>().ReverseMap();
+            CreateMap<Role, RoleDto>().ReverseMap();
             CreateMap<AuditLog, AuditLogDto>().ReverseMap();
             CreateMap<FreezerStock, FreezerStockDto>().ReverseMap();
             CreateMap<Freezer, FreezerDto>().ReverseMap();
             CreateMap<Vaccine, VaccineDto>().ReverseMap();
             CreateMap<VaccineOrder, VaccineOrderDto>().ReverseMap();
             CreateMap<VaccineFreezer, VaccineFreezerDto>().ReverseMap();
-            CreateMap<FreezerTemprature, FreezerTempratureDto>().ReverseMap();
+            CreateMap<FreezerTemperature, FreezerTemperatureDto>().ReverseMap();
             // Diğer entity <-> dto eşlemeleri de buraya eklenebilir
         }
     }

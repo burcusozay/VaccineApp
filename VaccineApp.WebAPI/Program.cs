@@ -9,6 +9,7 @@ using VaccineApp.Business.Register;
 using VaccineApp.Business.Repository;
 using VaccineApp.Business.UnitOfWork;
 using VaccineApp.Data.Context;
+using VaccineApp.DataSeed;
 using VaccineApp.ViewModel.Options;
 
 public class Program
@@ -113,6 +114,9 @@ public class Program
         app.UseAuthentication(); // Auth middleware aktif edilmeli
         app.UseAuthorization();
         app.MapControllers();
+
+        VaccineDbSeed.SeedDatabase(app, builder.Environment.IsDevelopment());
+
         app.Run();
     }
 }

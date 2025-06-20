@@ -13,16 +13,16 @@ namespace VaccineApp.Business.Services
     public class UserService : BaseService<User, UserDto>, IUserService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IRepository<User, long> _userRepo;
+        private readonly IRepository<User, Guid> _userRepo;
         private readonly IPasswordHasher<User> _passwordHasher;
         public UserService(IUnitOfWork unitOfWork, IPasswordHasher<User> passwordHasher, ILogger<UserService> logger, IMapper mapper) : base(mapper)
         {
             _unitOfWork = unitOfWork;
             _passwordHasher = passwordHasher;
-            _userRepo = _unitOfWork.GetRepository<User, long>();
+            _userRepo = _unitOfWork.GetRepository<User, Guid>();
         }
 
-        public async Task<UserDto> GetUserByIdAsync(long id)
+        public async Task<UserDto> GetUserByIdAsync(Guid id)
         {
             var user = await _userRepo.GetByIdAsync(id);
             if (user == null)

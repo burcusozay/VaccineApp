@@ -12,8 +12,8 @@
         public DateTime? Revoked { get; set; }
         public string? RevokedByIp { get; set; }
         public string? ReplacedByToken { get; set; }
-        public bool IsActive => Revoked == null && !IsExpired; 
-        public long UserId { get; set; } 
+        public bool IsActive { get; set; } 
+        public Guid UserId { get; set; } 
 
     }
 }

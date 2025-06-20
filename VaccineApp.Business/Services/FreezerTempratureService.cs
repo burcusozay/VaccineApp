@@ -8,44 +8,43 @@ using VaccineApp.ViewModel.Dtos;
 
 namespace VaccineApp.Business.Services
 {
-    public class FreezerTempratureService : BaseService<FreezerTemprature, FreezerTempratureDto>, IFreezerTempratureService
+    public class FreezerTemperatureService : BaseService<FreezerTemperature, FreezerTemperatureDto>, IFreezerTemperatureService
     {
         private readonly IUnitOfWork _unitOfWork; 
-        private readonly IRepository<FreezerTemprature, long> _freezerTempratureRepository;
+        private readonly IRepository<FreezerTemperature, long> _freezerTemperatureRepository;
 
-        public FreezerTempratureService(IUnitOfWork unitOfWork, IMapper mapper)
+        public FreezerTemperatureService(IUnitOfWork unitOfWork, IMapper mapper)
             : base(mapper)
         {
             _unitOfWork = unitOfWork;
-            _freezerTempratureRepository = _unitOfWork.GetRepository<FreezerTemprature, long>();
+            _freezerTemperatureRepository = _unitOfWork.GetRepository<FreezerTemperature, long>();
         }
 
-        public async Task<IEnumerable<FreezerTempratureDto>> GetAllTempraturesAsync()
+        public async Task<IEnumerable<FreezerTemperatureDto>> GetAllTemperaturesAsync()
         {
-            var tempratureList = await _freezerTempratureRepository.GetAllAsync();
+            var tempratureList = await _freezerTemperatureRepository.GetAllAsync();
             return  MapToDtoList(tempratureList);
         }
 
-        public async Task<FreezerTempratureDto?> GetTempratureByIdAsync(int id)
+        public async Task<FreezerTemperatureDto?> GetTemperatureByIdAsync(int id)
         {
-            var tempratureDto = await _freezerTempratureRepository.GetByIdAsync(id);
+            var tempratureDto = await _freezerTemperatureRepository.GetByIdAsync(id);
             return MapToDto(tempratureDto);
         }
 
-        public async Task<FreezerTempratureDto> AddTempratureAsync(FreezerTempratureDto model)
+        public async Task<FreezerTemperatureDto> AddTemperatureAsync(FreezerTemperatureDto model)
         {
             var tempratureEntity = MapToEntity(model);
-            tempratureEntity = await _freezerTempratureRepository.InsertAsync(tempratureEntity);
-            await _unitOfWork.SaveChangesAsync();
+            tempratureEntity = await _freezerTemperatureRepository.InsertAsync(tempratureEntity);
             return  MapToDto(tempratureEntity); ;
         }
 
-        public async Task<FreezerTempratureDto?> UpdateTempratureAsync(int id, FreezerTempratureDto model)
+        public async Task<FreezerTemperatureDto?> UpdateTemperatureAsync(int id, FreezerTemperatureDto model)
         {
-            var existing = await _freezerTempratureRepository.GetByIdAsync(id);
+            var existing = await _freezerTemperatureRepository.GetByIdAsync(id);
             if (existing is null) return null;
 
-            existing.Temprature = model.Temprature;
+            existing.Temperature = model.Temperature;
             // diğer alanlar güncellenebilir...
 
             await _unitOfWork.SaveChangesAsync();
@@ -55,12 +54,12 @@ namespace VaccineApp.Business.Services
             return tempratureDto;
         }
 
-        public async Task<bool> DeleteTempratureAsync(int id)
+        public async Task<bool> DeleteTemperatureAsync(int id)
         {
-            var existing = await _freezerTempratureRepository.GetByIdAsync(id);
+            var existing = await _freezerTemperatureRepository.GetByIdAsync(id);
             if (existing is null) return false;
 
-            await _freezerTempratureRepository.DeleteAsync(existing);
+            await _freezerTemperatureRepository.DeleteAsync(existing);
             await _unitOfWork.SaveChangesAsync();
             return true;
         }

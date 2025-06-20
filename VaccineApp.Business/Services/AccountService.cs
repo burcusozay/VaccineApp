@@ -61,8 +61,7 @@ namespace VaccineApp.Business.Services
                 AccessToken = accessToken,
                 RefreshToken = refreshToken.RefreshToken,
                 ExpirationTime = refreshToken.Expires,
-                Username = user.Username,
-                Role = user.Role
+                Username = user.Username
             };
         }
 
@@ -74,7 +73,7 @@ namespace VaccineApp.Business.Services
 
         public async Task<RefreshTokenDto?> CreateRefreshTokenAsync(RefreshTokenRequestDto request)
         {
-            if (string.IsNullOrEmpty(request.AccessToken) || request.UserId <= 0)
+            if (string.IsNullOrEmpty(request.AccessToken) || (request.UserId != Guid.Empty) )
                 return null;
 
             // Yeni token üret
@@ -168,7 +167,7 @@ namespace VaccineApp.Business.Services
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Username),
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Role, user.Role),
+                new Claim(ClaimTypes.Role, string.Join(',', user.Roles)),
             };
 
             return new JwtSecurityToken(

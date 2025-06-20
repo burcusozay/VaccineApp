@@ -42,8 +42,14 @@ namespace VaccineApp.Data.Migrations
                     b.Property<string>("Controller")
                         .HasColumnType("text");
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("IpAddress")
                         .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -77,6 +83,9 @@ namespace VaccineApp.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityAlwaysColumn(b.Property<long>("Id"));
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
@@ -104,6 +113,12 @@ namespace VaccineApp.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityAlwaysColumn(b.Property<long>("Id"));
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
@@ -124,13 +139,13 @@ namespace VaccineApp.Data.Migrations
                     b.ToTable("FreezerStock", (string)null);
                 });
 
-            modelBuilder.Entity("VaccineApp.Data.Entities.FreezerTemprature", b =>
+            modelBuilder.Entity("VaccineApp.Data.Entities.FreezerTemperature", b =>
                 {
-                    b.Property<long>("id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityAlwaysColumn(b.Property<long>("id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityAlwaysColumn(b.Property<long>("Id"));
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
@@ -138,25 +153,22 @@ namespace VaccineApp.Data.Migrations
                     b.Property<long>("FreezerId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<decimal>("Temprature")
+                    b.Property<decimal>("Temperature")
                         .HasPrecision(5, 2)
                         .HasColumnType("numeric(5,2)");
 
-                    b.HasKey("id")
-                        .HasName("FreezerTempratures_pk");
+                    b.HasKey("Id")
+                        .HasName("FreezerTemperatures_pk");
 
                     b.HasIndex("FreezerId");
 
-                    b.ToTable("FreezerTempratures");
+                    b.ToTable("FreezerTemperatures");
                 });
 
             modelBuilder.Entity("VaccineApp.Data.Entities.RefreshToken", b =>
@@ -174,8 +186,14 @@ namespace VaccineApp.Data.Migrations
                         .IsRequired()
                         .HasColumnType("character varying");
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<DateTime>("Expires")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -193,34 +211,29 @@ namespace VaccineApp.Data.Migrations
                         .IsRequired()
                         .HasColumnType("character varying");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.Property<long>("UserId1")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id")
                         .HasName("RefreshToken_pk");
 
-                    b.HasIndex("UserId1");
+                    b.HasIndex("UserId");
 
                     b.ToTable("RefreshTokens");
                 });
 
-            modelBuilder.Entity("VaccineApp.Data.Entities.User", b =>
+            modelBuilder.Entity("VaccineApp.Data.Entities.Role", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityAlwaysColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("character varying");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("character varying");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
@@ -232,17 +245,53 @@ namespace VaccineApp.Data.Migrations
                         .IsRequired()
                         .HasColumnType("character varying");
 
+                    b.Property<string>("NormalizedName")
+                        .IsRequired()
+                        .HasColumnType("character varying");
+
+                    b.HasKey("Id")
+                        .HasName("Roles_pk");
+
+                    b.ToTable("Roles");
+                });
+
+            modelBuilder.Entity("VaccineApp.Data.Entities.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("character varying");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("character varying");
+
+                    b.Property<string>("NormalizedUserName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Phone")
+                    b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("character varying");
-
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("Surname")
                         .IsRequired()
@@ -258,6 +307,37 @@ namespace VaccineApp.Data.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("VaccineApp.Data.Entities.UserRole", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id")
+                        .HasName("UserRoles_pk");
+
+                    b.HasIndex("RoleId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserRoles");
+                });
+
             modelBuilder.Entity("VaccineApp.Data.Entities.Vaccine", b =>
                 {
                     b.Property<long>("Id")
@@ -269,6 +349,9 @@ namespace VaccineApp.Data.Migrations
                     b.Property<string>("CompanyName")
                         .IsRequired()
                         .HasColumnType("character varying");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
@@ -296,8 +379,14 @@ namespace VaccineApp.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityAlwaysColumn(b.Property<long>("Id"));
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<long>("FreezerId")
                         .HasColumnType("bigint");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -329,14 +418,17 @@ namespace VaccineApp.Data.Migrations
                     b.Property<long>("FreezerStockId")
                         .HasColumnType("bigint");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.Property<int>("VaccineOrderCount")
                         .HasColumnType("integer");
@@ -362,13 +454,13 @@ namespace VaccineApp.Data.Migrations
                     b.Navigation("VaccineFreezer");
                 });
 
-            modelBuilder.Entity("VaccineApp.Data.Entities.FreezerTemprature", b =>
+            modelBuilder.Entity("VaccineApp.Data.Entities.FreezerTemperature", b =>
                 {
                     b.HasOne("VaccineApp.Data.Entities.Freezer", "Freezer")
-                        .WithMany("FreezerTempratures")
+                        .WithMany("FreezerTemperatures")
                         .HasForeignKey("FreezerId")
                         .IsRequired()
-                        .HasConstraintName("FreezerTempraturesFreezers_fk");
+                        .HasConstraintName("FreezerTemperaturesFreezers_fk");
 
                     b.Navigation("Freezer");
                 });
@@ -377,9 +469,28 @@ namespace VaccineApp.Data.Migrations
                 {
                     b.HasOne("VaccineApp.Data.Entities.User", "User")
                         .WithMany("RefreshTokens")
-                        .HasForeignKey("UserId1")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("VaccineApp.Data.Entities.UserRole", b =>
+                {
+                    b.HasOne("VaccineApp.Data.Entities.Role", "Role")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("RoleId")
+                        .IsRequired()
+                        .HasConstraintName("UserRoles_Roles_fk");
+
+                    b.HasOne("VaccineApp.Data.Entities.User", "User")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("UserId")
+                        .IsRequired()
+                        .HasConstraintName("UserRoles_Users_fk");
+
+                    b.Navigation("Role");
 
                     b.Navigation("User");
                 });
@@ -424,7 +535,7 @@ namespace VaccineApp.Data.Migrations
 
             modelBuilder.Entity("VaccineApp.Data.Entities.Freezer", b =>
                 {
-                    b.Navigation("FreezerTempratures");
+                    b.Navigation("FreezerTemperatures");
 
                     b.Navigation("VaccineFreezers");
                 });
@@ -434,9 +545,16 @@ namespace VaccineApp.Data.Migrations
                     b.Navigation("VaccineOrders");
                 });
 
+            modelBuilder.Entity("VaccineApp.Data.Entities.Role", b =>
+                {
+                    b.Navigation("UserRoles");
+                });
+
             modelBuilder.Entity("VaccineApp.Data.Entities.User", b =>
                 {
                     b.Navigation("RefreshTokens");
+
+                    b.Navigation("UserRoles");
 
                     b.Navigation("VaccineOrders");
                 });

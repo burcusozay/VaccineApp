@@ -5,7 +5,7 @@ namespace VaccineApp.Business.Interfaces
 {
     public interface IUserService
     { 
-        Task<UserDto> GetUserByIdAsync(long id);
+        Task<UserDto> GetUserByIdAsync(Guid id);
         Task<UserDto> VerifyUser(UserCheckDto model);
         Task<UserDto> GetUserByUsernameAsync(string username);
         Task<List<UserDto>> GetUserListAsync(string token);

@@ -9,14 +9,13 @@ namespace WebAPI
     {
         public AppDbContext CreateDbContext(string[] args)
         {
-            var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
-
+            var enviromentName =  Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
             var config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json")
-                .AddJsonFile($"appsettings.{environmentName}.json", optional: true)
+                .AddJsonFile($"appsettings.{enviromentName}.json", optional: true)
                 .Build();
-
+              
             var builder = new DbContextOptionsBuilder<AppDbContext>();
             var connectionString = config.GetConnectionString("PostgresConnection");
 
