@@ -15,6 +15,11 @@ internal class Program
             .Build();
 
         builder.Services.Configure<ServiceAccountOptions>(builder.Configuration.GetSection("ServiceAccount"));
+        builder.Services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = builder.Configuration["Redis:ConnectionString"];
+            options.InstanceName = builder.Configuration["Redis:InstanceName"];
+        });
         builder.Services.AddHostedService<RabbitMqConsumerWorker>();
         builder.Services.AddHttpClient();
         builder.Configuration.GetConnectionString("PostgresConnection");

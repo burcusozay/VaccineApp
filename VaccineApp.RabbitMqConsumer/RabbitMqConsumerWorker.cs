@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -6,8 +7,8 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using VaccineApp.Core.Core;
+using VaccineApp.RabbitMqConsumer.Dtos;
 using VaccineApp.RabbitMqConsumer.Options;
-using VaccineApp.ViewModel.Dtos;
 
 namespace VaccineApp.RabbitMqConsumer
 {
@@ -17,13 +18,19 @@ namespace VaccineApp.RabbitMqConsumer
         private readonly ServiceAccountOptions _serviceAccount;
         private Dictionary<long, decimal> _consecutiveOverFive;
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IDistributedCache _distributedCache;
+        private string _bearerToken;
+        private DateTime _tokenExpire;
+        private readonly object _tokenLock = new object();
 
-        public RabbitMqConsumerWorker(ILogger<RabbitMqConsumerWorker> logger, IOptions<ServiceAccountOptions> serviceAccount, IHttpClientFactory httpClientFactory)
+
+        public RabbitMqConsumerWorker(ILogger<RabbitMqConsumerWorker> logger, IOptions<ServiceAccountOptions> serviceAccount, IHttpClientFactory httpClientFactory, IDistributedCache distributedCache)
         {
             _logger = logger;
             _consecutiveOverFive = new Dictionary<long, decimal>();
             _serviceAccount = serviceAccount.Value;
             _httpClientFactory = httpClientFactory;
+            _distributedCache = distributedCache;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -95,22 +102,8 @@ namespace VaccineApp.RabbitMqConsumer
             {
 
                 using var httpClient = _httpClientFactory.CreateClient();
-
-                // 1. Önce token al
-                var loginRequest = new
-                {
-                    Username = _serviceAccount.Username,
-                    Password = _serviceAccount.Password
-                };
-                var tokenResponse = await httpClient.PostAsJsonAsync($"{_serviceAccount.TokenEndpoint}", loginRequest);
-                tokenResponse.EnsureSuccessStatusCode();
-
-                var tokenContent = await tokenResponse.Content.ReadFromJsonAsync<LoginResponseDto>();
-                string token = tokenContent?.AccessToken;
-                if (token == null)
-                {
-                    throw new Exception($"Token could not taken for user:{_serviceAccount.Username}");
-                }
+                // Token’ý thread-safe þekilde al
+                var token = await GetBearerTokenAsync();
 
                 // 2. Token'ý header'a ekle
                 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
@@ -124,6 +117,50 @@ namespace VaccineApp.RabbitMqConsumer
             { 
                 throw ex;
             }
+        }
+
+        private async Task<string> GetBearerTokenAsync()
+        {
+            const string tokenKey = "service_bearer_token";
+            string token = await _distributedCache.GetStringAsync(tokenKey);
+            if (!string.IsNullOrEmpty(token))
+            {
+                return token;
+            }
+
+            // Token cache kontrolü
+            lock (_tokenLock)
+            {
+                if (!string.IsNullOrEmpty(_bearerToken) && DateTime.UtcNow < _tokenExpire)
+                {
+                    return _bearerToken;
+                }
+            }
+
+            // Token alýnmamýþ veya süresi geçmiþse tekrar iste
+            using var httpClient = _httpClientFactory.CreateClient();
+            var loginRequest = new
+            {
+                Username = _serviceAccount.Username,
+                Password = _serviceAccount.Password
+            };
+            var tokenResponse = await httpClient.PostAsJsonAsync(_serviceAccount.TokenEndpoint, loginRequest);
+            tokenResponse.EnsureSuccessStatusCode();
+
+            var tokenContent = await tokenResponse.Content.ReadFromJsonAsync<LoginResponseDto>();
+            token = tokenContent?.AccessToken;
+            var expires = tokenContent.ExpirationTime; // Token süresini payload'dan alabilirsin
+
+            if (token == null)
+                throw new Exception("Token alýnamadý.");
+
+            var options = new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
+            };
+            await _distributedCache.SetStringAsync(tokenKey, token, options);
+
+            return token;
         }
     }
 }

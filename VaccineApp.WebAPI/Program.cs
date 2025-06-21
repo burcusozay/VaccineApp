@@ -26,7 +26,7 @@ public class Program
         builder.Services.AddStackExchangeRedisCache(options =>
         {
             options.Configuration = builder.Configuration["Redis:ConnectionString"];
-            options.InstanceName = "VaccineCache:";
+            options.InstanceName = builder.Configuration["Redis:InstanceName"];  
         });
 
         builder.Services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));

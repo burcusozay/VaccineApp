@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.6" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.6" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
@@ -16,6 +17,5 @@
 
   <ItemGroup>
     <ProjectReference Include="..\VaccineApp.Core\VaccineApp.Core.csproj" />
-    <ProjectReference Include="..\VaccineApp.ViewModel\VaccineApp.ViewModel.csproj" />
   </ItemGroup>
 </Project>
