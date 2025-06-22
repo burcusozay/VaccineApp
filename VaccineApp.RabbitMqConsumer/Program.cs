@@ -22,7 +22,7 @@ internal class Program
         });
         builder.Services.AddHostedService<RabbitMqConsumerWorker>();
         builder.Services.AddHttpClient();
-        builder.Configuration.GetConnectionString("PostgresConnection");
+        //builder.Configuration.GetConnectionString("PostgresConnection");
 
         var host = builder.Build();
         host.Run();

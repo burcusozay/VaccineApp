@@ -1,18 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using VaccineApp.Business.Interfaces;
-using VaccineApp.Data.Entities;
 using VaccineApp.ViewModel.Dtos;
 
 namespace WebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-
     public class OutboxMessageController : ControllerBase
     {
         private readonly IOutboxMessageService _outboxMessageService;
-
         public OutboxMessageController(IOutboxMessageService outboxMessageService)
         {
             _outboxMessageService = outboxMessageService;

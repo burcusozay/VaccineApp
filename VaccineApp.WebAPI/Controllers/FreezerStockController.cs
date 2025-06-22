@@ -26,8 +26,8 @@ namespace WebAPI.Controllers
             return Ok(stock);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateFreezerStock([FromBody] FreezerStockDto model)
+        [HttpPost("AddFreezerStock")]
+        public async Task<IActionResult> AddFreezerStock([FromBody] FreezerStockDto model)
         {
             var created = await _stockService.AddStockAsync(model);
             return CreatedAtAction(nameof(GetFreezerStock), new { id = created.Id }, created);

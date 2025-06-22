@@ -24,8 +24,8 @@ namespace WebAPI.Controllers
             return Ok(stock);
         }
 
-        [HttpPost("CreateFreezerTemperature")]
-        public async Task<IActionResult> CreateFreezerTemperature([FromBody] FreezerTemperatureDto model)
+        [HttpPost("AddFreezerTemperature")]
+        public async Task<IActionResult> AddFreezerTemperature([FromBody] FreezerTemperatureDto model)
         {
             var created = await _tempratureService.AddTemperatureAsync(model);
             return CreatedAtAction(nameof(GetFreezerTemperature), new { id = created.Id }, created);

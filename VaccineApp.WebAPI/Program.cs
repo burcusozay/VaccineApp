@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -53,6 +55,11 @@ public class Program
         {
             //options.Filters.Add<UnitOfWorkTransactionFilter>();
             options.Filters.AddService<AuditActionFilter>();
+            // BURASI ÇOK ÖNEMLÝ DEÐÝÞÝKLÝK: Global Yetkilendirme Filtresi Ekleme
+            var policy = new AuthorizationPolicyBuilder()
+                .RequireAuthenticatedUser() // Kimliði doðrulanmýþ kullanýcý gerektir
+                .Build();
+            options.Filters.Add(new AuthorizeFilter(policy)); // Bu politikayý global olarak uygula
         });
 
         // JWT konfigürasyonu (appsettings.json -> "Jwt" section kullanýlmalý)

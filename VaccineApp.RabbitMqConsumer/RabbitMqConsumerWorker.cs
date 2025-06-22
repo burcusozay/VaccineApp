@@ -121,7 +121,7 @@ namespace VaccineApp.RabbitMqConsumer
 
         private async Task<string> GetBearerTokenAsync()
         {
-            const string tokenKey = "service_bearer_token";
+            const string tokenKey = "rabbit_bearer_token";
             string token = await _distributedCache.GetStringAsync(tokenKey);
             if (!string.IsNullOrEmpty(token))
             {
@@ -149,10 +149,11 @@ namespace VaccineApp.RabbitMqConsumer
 
             var tokenContent = await tokenResponse.Content.ReadFromJsonAsync<LoginResponseDto>();
             token = tokenContent?.AccessToken;
-            var expires = tokenContent.ExpirationTime; // Token süresini payload'dan alabilirsin
 
             if (token == null)
                 throw new Exception("Token alýnamadý.");
+
+            var expires = tokenContent.ExpirationTime; // Token süresini payload'dan alabilirsin
 
             var options = new DistributedCacheEntryOptions
             {
