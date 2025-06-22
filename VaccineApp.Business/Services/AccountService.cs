@@ -105,7 +105,7 @@ namespace VaccineApp.Business.Services
                 CreatedByIp = _httpContext.HttpContext.Connection.RemoteIpAddress.ToString() ?? "local",
                 Expires = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpirationDays),
                 UserId = user.Id,
-                Created = DateTime.UtcNow,
+                CreatedDate = DateTime.UtcNow,
                 ReplacedByToken = existingToken?.RefreshToken,
             };
         }

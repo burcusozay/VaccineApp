@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 using VaccineApp.Business.Base;
 using VaccineApp.Business.Interfaces;
 using VaccineApp.Business.Repository;
@@ -10,20 +12,22 @@ namespace VaccineApp.Business.Services
 {
     public class FreezerTemperatureService : BaseService<FreezerTemperature, FreezerTemperatureDto>, IFreezerTemperatureService
     {
-        private readonly IUnitOfWork _unitOfWork; 
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IRepository<FreezerTemperature, long> _freezerTemperatureRepository;
+        private readonly IOutboxMessageService _outboxMessageService;
 
-        public FreezerTemperatureService(IUnitOfWork unitOfWork, IMapper mapper)
+        public FreezerTemperatureService(IUnitOfWork unitOfWork, IMapper mapper, IOutboxMessageService outboxService)
             : base(mapper)
         {
             _unitOfWork = unitOfWork;
             _freezerTemperatureRepository = _unitOfWork.GetRepository<FreezerTemperature, long>();
+            _outboxMessageService = outboxService;
         }
 
         public async Task<IEnumerable<FreezerTemperatureDto>> GetAllTemperaturesAsync()
         {
             var tempratureList = await _freezerTemperatureRepository.GetAllAsync();
-            return  MapToDtoList(tempratureList);
+            return MapToDtoList(tempratureList);
         }
 
         public async Task<FreezerTemperatureDto?> GetTemperatureByIdAsync(int id)
@@ -36,7 +40,22 @@ namespace VaccineApp.Business.Services
         {
             var tempratureEntity = MapToEntity(model);
             tempratureEntity = await _freezerTemperatureRepository.InsertAsync(tempratureEntity);
-            return  MapToDto(tempratureEntity); ;
+
+            var outboxMsg = new OutboxMessageDto
+            {
+                Type = "FreezerAlarm",
+                Payload = JsonSerializer.Serialize(new
+                {
+                    FreezerId = tempratureEntity.FreezerId,
+                    Temperature = tempratureEntity.Temperature,
+                    CreatedAt = tempratureEntity.CreatedDate
+                }),
+                OccuredOn = DateTime.UtcNow
+            };
+
+            await _outboxMessageService.AddOutboxMessageAsync(outboxMsg);
+
+            return MapToDto(tempratureEntity); ;
         }
 
         public async Task<FreezerTemperatureDto?> UpdateTemperatureAsync(int id, FreezerTemperatureDto model)
@@ -49,7 +68,7 @@ namespace VaccineApp.Business.Services
 
             await _unitOfWork.SaveChangesAsync();
 
-            var tempratureDto =  MapToDto(existing);
+            var tempratureDto = MapToDto(existing);
 
             return tempratureDto;
         }

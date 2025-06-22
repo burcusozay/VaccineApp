@@ -27,6 +27,7 @@ public partial class AppDbContext : DbContext
     public virtual DbSet<VaccineOrder> VaccineOrders { get; set; }
     public virtual DbSet<AuditLog> AuditLogs { get; set; }
     public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
+    public virtual DbSet<OutboxMessage> OutboxMessages { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -167,13 +168,20 @@ public partial class AppDbContext : DbContext
         modelBuilder.Entity<RefreshToken>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("RefreshToken_pk");
-
             entity.Property(e => e.Id).UseIdentityAlwaysColumn();
-
             entity.Property(e => e.Token).HasColumnType("character varying"); 
             entity.Property(e => e.CreatedByIp).HasColumnType("character varying");
             entity.Property(e => e.RevokedByIp).HasColumnType("character varying");
             entity.Property(e => e.ReplacedByToken).HasColumnType("character varying");
+        });
+
+        modelBuilder.Entity<OutboxMessage>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("OutboxMessage_pk");
+            entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+            entity.Property(e => e.Type).HasColumnType("character varying"); 
+            entity.Property(e => e.Payload).HasColumnType("character varying");
+            entity.Property(e => e.Error).HasColumnType("character varying"); 
 
         });
 

@@ -21,6 +21,8 @@ namespace VaccineApp.Business.AutoMapper
             CreateMap<VaccineOrder, VaccineOrderDto>().ReverseMap();
             CreateMap<VaccineFreezer, VaccineFreezerDto>().ReverseMap();
             CreateMap<FreezerTemperature, FreezerTemperatureDto>().ReverseMap();
+            CreateMap<FreezerTemperature, FreezerTemperatureDto>().ReverseMap();
+            CreateMap<OutboxMessage, OutboxMessageDto>().ReverseMap();
             // Diğer entity <-> dto eşlemeleri de buraya eklenebilir
         }
     }

@@ -12,7 +12,7 @@ using VaccineApp.Data.Context;
 namespace VaccineApp.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250620184911_InitialCodeFirstMigration")]
+    [Migration("20250622175142_InitialCodeFirstMigration")]
     partial class InitialCodeFirstMigration
     {
         /// <inheritdoc />
@@ -172,6 +172,46 @@ namespace VaccineApp.Data.Migrations
                     b.HasIndex("FreezerId");
 
                     b.ToTable("FreezerTemperatures");
+                });
+
+            modelBuilder.Entity("VaccineApp.Data.Entities.OutboxMessage", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityAlwaysColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Error")
+                        .HasColumnType("character varying");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("OccuredOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Payload")
+                        .IsRequired()
+                        .HasColumnType("character varying");
+
+                    b.Property<DateTime?>("ProcessedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("character varying");
+
+                    b.HasKey("Id")
+                        .HasName("OutboxMessage_pk");
+
+                    b.ToTable("OutboxMessages");
                 });
 
             modelBuilder.Entity("VaccineApp.Data.Entities.RefreshToken", b =>

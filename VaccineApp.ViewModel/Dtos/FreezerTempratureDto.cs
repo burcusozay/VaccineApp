@@ -1,15 +1,11 @@
-﻿namespace VaccineApp.ViewModel.Dtos
-{
-    public class FreezerTemperatureDto
-    {
-        public long Id { get; set; }
+﻿using VaccineApp.Core;
 
+namespace VaccineApp.ViewModel.Dtos
+{
+    public class FreezerTemperatureDto : BaseEntityDto<long>
+    {  
         public long FreezerId { get; set; }
 
-        public decimal Temperature { get; set; }
-
-        public DateTime CreatedDate { get; set; }
-
-        public bool IsDeleted { get; set; }
+        public decimal Temperature { get; set; } 
     }
 }

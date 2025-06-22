@@ -7,8 +7,8 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using VaccineApp.Core.Core;
-using VaccineApp.RabbitMqConsumer.Dtos;
 using VaccineApp.RabbitMqConsumer.Options;
+using VaccineApp.ViewModel.Dtos;
 
 namespace VaccineApp.RabbitMqConsumer
 {

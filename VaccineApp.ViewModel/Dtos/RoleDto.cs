@@ -1,18 +1,12 @@
-﻿namespace VaccineApp.ViewModel.Dtos
-{
-    public class RoleDto
-    {
-        public long Id { get; set; }
+﻿using VaccineApp.Core;
 
+namespace VaccineApp.ViewModel.Dtos
+{
+    public class RoleDto : BaseEntityDto<long>
+    {  
         public string Name { get; set; } = null!;
           
-        public string Normalizedname { get; set; } = null!;
-
-        public DateTime CreatedDate { get; set; }
-
-        public bool IsActive { get; set; }
-
-        public bool IsDeleted { get; set; }
+        public string Normalizedname { get; set; } = null!;  
 
         public string Description { get; set; } = null!; 
     }

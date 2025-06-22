@@ -1,12 +1,11 @@
-﻿namespace VaccineApp.ViewModel.Dtos
-{
-    public class VaccineOrderDto
-    {
-        public long Id { get; set; }
+﻿using VaccineApp.Core;
 
+namespace VaccineApp.ViewModel.Dtos
+{
+    public class VaccineOrderDto : BaseEntityDto<long>
+    { 
         public Guid UserId { get; set; }
 
-        public long FreezerStockId { get; set; }
-
+        public long FreezerStockId { get; set; } 
     }
 }

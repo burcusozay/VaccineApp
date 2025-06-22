@@ -14,5 +14,10 @@ namespace VaccineApp.Business.Repository
         Task DeleteAsync(T entity);
         Task SaveChangesAsync();
 
+        IQueryable<T> AsQueryable();
+        // Alternatif olarak, filtreli bir IQueryable döndürmek isterseniz:
+        IQueryable<T> AsQueryable(Expression<Func<T, bool>> predicate);
+
+
     }
 }

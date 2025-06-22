@@ -9,7 +9,7 @@ namespace VaccineApp.Business.Register
     public static class RegisterComponents
     {
         public static void AddComponents(this IServiceCollection services)
-        { 
+        {
             #region Main Module Services
             services.AddTransient<IFreezerStockService, FreezerStockService>();
             //services.AddTransient<IFreezerService, FreezerService>();
@@ -20,11 +20,12 @@ namespace VaccineApp.Business.Register
             services.AddTransient<IFreezerStockService, FreezerStockService>();
             services.AddTransient<IFreezerStockService, FreezerStockService>();
             services.AddTransient<IFreezerStockService, FreezerStockService>();
-            services.AddScoped<IAccountService, AccountService>();  
-            services.AddScoped<IUserService,UserService>(); 
-            services.AddScoped<IAccountService, AccountService>(); 
+            services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IAuditService, AuditService>();
-            services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>(); 
+            services.AddScoped<IOutboxMessageService, OutboxMessageService>();
+            services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
             #endregion
         }

@@ -1,14 +1,11 @@
-﻿namespace VaccineApp.ViewModel.Dtos
-{
-    public class FreezerDto
-    {
-        public long Id { get; set; }
+﻿using VaccineApp.Core;
 
+namespace VaccineApp.ViewModel.Dtos
+{
+    public class FreezerDto : BaseEntity<long>
+    {
         public string Name { get; set; } = null!;
 
-        public bool IsDeleted { get; set; }
-
         public int OrderNo { get; set; }
-
     }
 }

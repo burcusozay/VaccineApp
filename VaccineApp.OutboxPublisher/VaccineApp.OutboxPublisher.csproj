@@ -4,23 +4,18 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>dotnet-Vaccine.RabbitMqConsumer-8bcf9d81-8e0d-4e1c-bab7-663a83613417</UserSecretsId>
+    <UserSecretsId>dotnet-VaccineApp.OutboxPublisher-6050a0eb-f135-44a7-9e2a-83d835bc5a51</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="DistributedLock" Version="2.6.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.6" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.6" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
-    <PackageReference Include="RabbitMQ.Client" Version="7.1.2" />
+    <PackageReference Include="StackExchange.Redis" Version="2.8.41" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\VaccineApp.Core\VaccineApp.Core.csproj" />
     <ProjectReference Include="..\VaccineApp.ViewModel\VaccineApp.ViewModel.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Dtos\" />
   </ItemGroup>
 </Project>

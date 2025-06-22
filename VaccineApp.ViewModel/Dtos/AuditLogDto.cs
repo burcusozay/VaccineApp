@@ -1,8 +1,9 @@
-﻿namespace VaccineApp.ViewModel.Dtos
+﻿using VaccineApp.Core;
+
+namespace VaccineApp.ViewModel.Dtos
 {
-    public class AuditLogDto
+    public class AuditLogDto : BaseEntityDto<long>
     {
-        public int Id { get; set; }
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
         public string? Username { get; set; }
         public string? IpAddress { get; set; }

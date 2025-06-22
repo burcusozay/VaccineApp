@@ -35,8 +35,7 @@ namespace VaccineApp.Business.Services
         public async Task<FreezerStockDto> AddStockAsync(FreezerStockDto model)
         {
             var stockEntity = MapToEntity(model);
-            stockEntity = await _freezerStockRepository.InsertAsync(stockEntity);
-            await _unitOfWork.SaveChangesAsync();
+            stockEntity = await _freezerStockRepository.InsertAsync(stockEntity); 
             return  MapToDto(stockEntity); ;
         }
 
@@ -48,7 +47,7 @@ namespace VaccineApp.Business.Services
             existing.StockCount = model.StockCount;
             // diğer alanlar güncellenebilir...
 
-            await _unitOfWork.SaveChangesAsync();
+            await _freezerStockRepository.UpdateAsync(existing);
 
             var stockDto =  MapToDto(existing);
 
@@ -60,8 +59,7 @@ namespace VaccineApp.Business.Services
             var existing = await _freezerStockRepository.GetByIdAsync(id);
             if (existing is null) return false;
 
-            await _freezerStockRepository.DeleteAsync(existing);
-            await _unitOfWork.SaveChangesAsync();
+            await _freezerStockRepository.DeleteAsync(existing); 
             return true;
         }
     }

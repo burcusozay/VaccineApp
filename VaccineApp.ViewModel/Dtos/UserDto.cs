@@ -1,20 +1,14 @@
-﻿namespace VaccineApp.ViewModel.Dtos
-{
-    public class UserDto
-    {
-        public Guid Id { get; set; }
+﻿using VaccineApp.Core;
 
+namespace VaccineApp.ViewModel.Dtos
+{
+    public class UserDto : BaseEntityDto<Guid>
+    {  
         public string Name { get; set; } = null!;
 
         public string Surname { get; set; } = null!;
 
-        public string Username { get; set; } = null!;
-
-        public DateTime CreatedDate { get; set; }
-
-        public bool IsActive { get; set; }
-
-        public bool IsDeleted { get; set; }
+        public string Username { get; set; } = null!; 
 
         public string Address { get; set; } = null!;
 

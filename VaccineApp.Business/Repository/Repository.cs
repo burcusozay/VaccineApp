@@ -54,10 +54,21 @@ namespace VaccineApp.Business.Repository
             _entities.Remove(entity);
             await Task.CompletedTask;
         }
-
+         
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();
+        }
+
+        // Yeni metot implementasyonu:
+        public IQueryable<T> AsQueryable()
+        {
+            return _entities.AsQueryable();
+        }
+
+        public IQueryable<T> AsQueryable(Expression<Func<T, bool>> predicate)
+        {
+            return _entities.Where(predicate).AsQueryable();
         }
     }
 }

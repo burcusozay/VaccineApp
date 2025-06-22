@@ -171,6 +171,46 @@ namespace VaccineApp.Data.Migrations
                     b.ToTable("FreezerTemperatures");
                 });
 
+            modelBuilder.Entity("VaccineApp.Data.Entities.OutboxMessage", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityAlwaysColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Error")
+                        .HasColumnType("character varying");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("OccuredOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Payload")
+                        .IsRequired()
+                        .HasColumnType("character varying");
+
+                    b.Property<DateTime?>("ProcessedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("character varying");
+
+                    b.HasKey("Id")
+                        .HasName("OutboxMessage_pk");
+
+                    b.ToTable("OutboxMessages");
+                });
+
             modelBuilder.Entity("VaccineApp.Data.Entities.RefreshToken", b =>
                 {
                     b.Property<long>("Id")

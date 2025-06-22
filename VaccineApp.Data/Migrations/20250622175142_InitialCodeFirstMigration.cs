@@ -55,6 +55,26 @@ namespace VaccineApp.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "OutboxMessages",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityAlwaysColumn),
+                    Type = table.Column<string>(type: "character varying", nullable: false),
+                    Payload = table.Column<string>(type: "character varying", nullable: false),
+                    OccuredOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ProcessedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    Error = table.Column<string>(type: "character varying", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("OutboxMessage_pk", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Roles",
                 columns: table => new
                 {
@@ -325,6 +345,9 @@ namespace VaccineApp.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "FreezerTemperatures");
+
+            migrationBuilder.DropTable(
+                name: "OutboxMessages");
 
             migrationBuilder.DropTable(
                 name: "RefreshTokens");

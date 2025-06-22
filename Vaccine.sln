@@ -45,6 +45,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VaccineApp.ViewModel", "Vac
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VaccineApp.WebAPI", "VaccineApp.WebAPI\VaccineApp.WebAPI.csproj", "{6010A2A0-6BC4-461B-B2BA-562599168B24}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VaccineApp.OutboxPublisher", "VaccineApp.OutboxPublisher\VaccineApp.OutboxPublisher.csproj", "{FB2E4D0E-D77B-4C75-8FDA-EBC812B991CD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{6010A2A0-6BC4-461B-B2BA-562599168B24}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6010A2A0-6BC4-461B-B2BA-562599168B24}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6010A2A0-6BC4-461B-B2BA-562599168B24}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB2E4D0E-D77B-4C75-8FDA-EBC812B991CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB2E4D0E-D77B-4C75-8FDA-EBC812B991CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB2E4D0E-D77B-4C75-8FDA-EBC812B991CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB2E4D0E-D77B-4C75-8FDA-EBC812B991CD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
