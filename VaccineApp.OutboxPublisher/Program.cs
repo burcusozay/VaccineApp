@@ -69,6 +69,8 @@ internal class Program
         // Redis ConnectionMultiplexer (Distributed Lock için)
         builder.Services.AddSingleton<IConnectionMultiplexer>(multiplexer => ConnectionMultiplexer.Connect(builder.Configuration["Redis:ConnectionString"]));
 
+        builder.Services.AddHttpClient();
+
         // MassTransit ve RabbitMQ Yapýlandýrmasý
         builder.Services.AddMassTransit(x =>
         {
@@ -84,7 +86,6 @@ internal class Program
 
         // Worker Servisi
         builder.Services.AddHostedService<OutboxPublisherWorker>();
-        builder.Services.AddHttpClient();
 
         var host = builder.Build();
         host.Run();

@@ -3,10 +3,10 @@ using Medallion.Threading;
 using Medallion.Threading.Redis;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
-using RabbitMQ.Client;
 using StackExchange.Redis;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text.Json;
 using VaccineApp.OutboxPublisher.Options;
 using VaccineApp.ViewModel.Dtos;
 using VaccineApp.ViewModel.Enums;
@@ -19,11 +19,11 @@ public class OutboxPublisherWorker : BackgroundService
     private readonly IDistributedCache _distributedCache;
     private readonly IBus _bus;
     private readonly ServiceAccountOptions _serviceAccount;
-    private string _bearerToken;
-    private DateTime _tokenExpire;
-    private readonly object _tokenLock = new object();
 
-    public OutboxPublisherWorker(IHttpClientFactory httpClientFactory,
+    // YAPILAN DEÐÝÞÝKLÝK: Constructor temizlendi.
+    // Artýk sadece gerçekten kullanýlan servisler enjekte ediliyor.
+    public OutboxPublisherWorker(
+        IHttpClientFactory httpClientFactory,
         IConnectionMultiplexer redis,
         ILogger<OutboxPublisherWorker> logger,
         IDistributedCache distributedCache,
@@ -47,14 +47,16 @@ public class OutboxPublisherWorker : BackgroundService
             try
             {
                 var client = _httpClientFactory.CreateClient();
+                // Her döngüde güncel ve geçerli bir token al
                 var token = await GetBearerTokenAsync(stoppingToken);
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-                // WebAPI'den iþlenmemiþ mesajlarý çek
                 var messages = await client.GetFromJsonAsync<List<OutboxMessageDto>>($"{_serviceAccount.ApiCallEndpoint}/UnprocessedList", cancellationToken: stoppingToken);
-                if (messages == null)
+
+                if (messages == null || !messages.Any())
                 {
-                    await Task.Delay(2000, stoppingToken); continue;
+                    await Task.Delay(2000, stoppingToken);
+                    continue;
                 }
 
                 foreach (var msg in messages)
@@ -62,28 +64,10 @@ public class OutboxPublisherWorker : BackgroundService
                     var lockKey = $"outbox-msg-lock:{msg.Id}";
                     await using (var handle = await locker.TryAcquireLockAsync(lockKey, TimeSpan.FromSeconds(10), stoppingToken))
                     {
-                        if (handle == null)
-                            continue; // Baþka worker iþliyor
+                        if (handle == null) continue;
 
                         try
                         {
-                            // Burada iþleme kodu (örn. event publish, baþka servise POST)
-                            // --- Örneðin alarmý RabbitMQ'ya publish et, vs. ---
-                            // Mesajý ilgili API'ye gönder (ör: WebAPI endpointine)
-                            // React Client Notification Gönder
-                            //var apiResponse = await client.PostAsJsonAsync(
-                            //    "https://localhost:44395/api/OutboxMessage/SendWebNotification",
-                            //    new
-                            //    {
-                            //        Id = msg.Id,
-                            //        Type = msg.Type,
-                            //        Payload = msg.Payload,                                    
-                            //    },
-                            //    stoppingToken
-                            //);
-                            //apiResponse.EnsureSuccessStatusCode();
-
-                            // Ýþlenince WebAPI'ye bildir
                             _logger.LogInformation($"Mesaj {msg.Id} iþleniyor.");
                             var markResponse = await client.PostAsync($"{_serviceAccount.ApiCallEndpoint}/MarkProcessed/{msg.Id}", null, stoppingToken);
                             markResponse.EnsureSuccessStatusCode();
@@ -91,30 +75,30 @@ public class OutboxPublisherWorker : BackgroundService
                         }
                         catch (Exception ex)
                         {
-                            // Hatalý durumda logla, DB’ye iþlenmemiþ olarak býrak
                             _logger.LogError(ex, $"Outbox mesajý iþlenirken hata: {msg.Id}");
-                            //await PublishFailedNotificationToRabbitAsync(msg.Id, ex.ToString());
                             await _bus.Publish(new NotificationDto
-                            { 
-                                Message = $"{msg.Id} id kayýt edilemedi. Hata: {ex.Message}",
+                            {
+                                Message = $"Mesaj ID {msg.Id} iþlenemedi. Hata: {ex.Message}",
                                 NotificationType = EnumNotificationType.Error,
                                 CreatedAt = DateTime.UtcNow
                             }, stoppingToken);
-                            _logger.LogInformation("Hata bildirimi RabbitMQ'ya gönderildi: {MessageId}", msg.Id);
-
                         }
                     }
                 }
-
-                await Task.Delay(2000, stoppingToken);
+            }
+            catch (HttpRequestException httpEx) when (httpEx.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                _logger.LogError(httpEx, "Yetkilendirme hatasý (401 Unauthorized) alýndý. Token geçersiz veya süresi dolmuþ olabilir. Cache temizleniyor...");
+                // Token geçersizse cache'i temizle ki bir sonraki denemede yeni token alýnsýn.
+                await _distributedCache.RemoveAsync("outbox_bearer_token", stoppingToken);
+                await Task.Delay(1000, stoppingToken); // Kýsa bir süre bekle
             }
             catch (Exception ex)
             {
-                // Network veya global hata varsa bir süre bekle
-                _logger.LogError(ex, "Outbox modülünde hata oluþtu");
+                _logger.LogError(ex, "Outbox modülünde genel bir hata oluþtu.");
                 await _bus.Publish(new NotificationDto
-                { 
-                    Message = $"Outbox modülünde hata oluþtu. Hata: {ex.Message}",
+                {
+                    Message = $"Outbox modülünde genel bir hata oluþtu. Hata: {ex.Message}",
                     NotificationType = EnumNotificationType.Error,
                     CreatedAt = DateTime.UtcNow
                 }, stoppingToken);
@@ -122,124 +106,81 @@ public class OutboxPublisherWorker : BackgroundService
             }
         }
     }
-    //private async Task PublishFailedNotificationToRabbitAsync(long messageId, string error)
-    //{
-    //    IChannel? channel = null; // Kanalý dýþarýda tanýmlýyoruz ki hata durumunda Dispose edebilelim
-
-    //    try
-    //    {
-    //        // RabbitMQ Connection'ý açýk mý kontrol et
-    //        if (!_rabbitMqConnection.IsOpen)
-    //        {
-    //            _logger.LogError("RabbitMQ baðlantýsý kapalý! Bildirim gönderilemedi: {MessageId}", messageId);
-    //            // Baðlantý kapalýysa daha fazla denemeden çýkabiliriz veya retry mekanizmasý uygulayabiliriz.
-    //            return;
-    //        }
-
-    //        // Yeni bir kanal oluþtur
-    //        channel = await _rabbitMqConnection.CreateChannelAsync();
-
-    //        // Kuyruðu Declare et
-    //        // Bu kuyruk adýný da RabbitMqOptions'tan alabiliriz, bu daha esnek olur.
-    //        var notificationQueueName = _rabbitMqOptions.NotificationQueueName ?? "notification_queue"; // appsettings'ten gelmeli
-    //        await channel.QueueDeclareAsync(
-    //            queue: notificationQueueName,
-    //            durable: false,
-    //            exclusive: false,
-    //            autoDelete: false
-    //        );
-    //        _logger.LogInformation("Kuyruk '{QueueName}' hazýrlandý.", notificationQueueName);
-
-    //        var notification = new
-    //        {
-    //            MessageId = messageId,
-    //            Error = error,
-    //            CreatedAt = DateTime.UtcNow
-    //        };
-    //        var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(notification));
-
-    //        await channel.BasicPublishAsync(
-    //            exchange: "",
-    //            routingKey: notificationQueueName, // Kuyruk adýný routing key olarak kullanýyoruz
-    //            body: body
-    //        );
-    //        _logger.LogInformation("Baþarýsýz bildirim RabbitMQ kuyruðuna gönderildi: MessageId={MessageId}, Error={Error}", messageId, error);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        // RabbitMQ'ya mesaj gönderirken herhangi bir hata oluþursa logla
-    //        _logger.LogError(ex, "RabbitMQ'ya bildirim gönderilirken hata oluþtu: MessageId={MessageId}, Error={Error}", messageId, error);
-    //    }
-    //    finally
-    //    {
-    //        // Kanalý her zaman dispose et
-    //        // using bloðu yerine manuel dispose kullanýyoruz çünkü try-catch-finally yapýsý var.
-    //        if (channel != null && channel.IsOpen)
-    //        {
-    //            try
-    //            {
-    //                await channel.CloseAsync(); // Kanalý kapat
-    //            }
-    //            catch (Exception closeEx)
-    //            {
-    //                _logger.LogError(closeEx, "RabbitMQ kanalý kapatýlýrken hata oluþtu.");
-    //            }
-    //        }
-    //        channel?.Dispose(); // Kanalý dispose et
-    //    }
-    //}
 
     /// <summary>
-    /// Bearer token'ý alýr ve cache'ler.
+    /// Sadece bu sýnýf içinde token ve son kullanma tarihini bir arada tutmak için kullanýlýr.
     /// </summary>
-    /// <param name="stoppingToken"></param>
-    /// <returns></returns>
-    /// <exception cref="Exception"></exception>
+    private class CachedTokenInfo
+    {
+        public string AccessToken { get; set; }
+        public DateTime ExpirationTime { get; set; }
+    }
+
+    /// <summary>
+    /// Bearer token'ý alýr. Token'ý öncelikle Redis cache'den okumaya çalýþýr.
+    /// Cache'de yoksa veya geçersizse, login endpoint'inden yenisini alýr ve cache'ler.
+    /// </summary>
     private async Task<string> GetBearerTokenAsync(CancellationToken stoppingToken)
     {
         const string tokenKey = "outbox_bearer_token";
-        string token = await _distributedCache.GetStringAsync(tokenKey, stoppingToken);
-        if (!string.IsNullOrEmpty(token))
-        {
-            return token;
-        }
 
-        // Token cache kontrolü
-        lock (_tokenLock)
+        // 1. Token'ý ve son kullanma tarihini Redis'ten almayý dene.
+        var cachedTokenJson = await _distributedCache.GetStringAsync(tokenKey, stoppingToken);
+        if (!string.IsNullOrEmpty(cachedTokenJson))
         {
-            if (!string.IsNullOrEmpty(_bearerToken) && DateTime.UtcNow < _tokenExpire)
+            try
             {
-                return _bearerToken;
+                var cachedToken = JsonSerializer.Deserialize<LoginResponseDto>(cachedTokenJson);
+
+                // YENÝ EKLENEN KONTROL: Token'ýn süresinin dolup dolmadýðýný kontrol et.
+                // Token'ýn süresinin dolmasýna 15 saniyeden fazla varsa geçerli say.
+                if (cachedToken != null && cachedToken.ExpirationTime > DateTime.UtcNow.AddSeconds(15))
+                {
+                    _logger.LogInformation("Bearer token Redis cache'den baþarýyla alýndý ve geçerli.");
+                    return cachedToken.AccessToken;
+                }
+                _logger.LogWarning("Redis cache'de bulunan token'ýn süresi dolmuþ veya dolmak üzere.");
+            }
+            catch (JsonException jsonEx)
+            {
+                _logger.LogError(jsonEx, "Redis'teki token verisi JSON formatýnda deðil. Cache temizleniyor.");
+                await _distributedCache.RemoveAsync(tokenKey, stoppingToken); // Bozuk veriyi temizle
             }
         }
 
-        // Token alýnmamýþ veya süresi geçmiþse tekrar iste
+        // 2. Cache'de yoksa veya süresi dolmuþsa, API'den yeni token al.
+        _logger.LogInformation("API'den yeni token isteniyor...");
         using var httpClient = _httpClientFactory.CreateClient();
-        var loginRequest = new
-        {
-            Username = _serviceAccount.Username,
-            Password = _serviceAccount.Password
-        };
+        var loginRequest = new { Username = _serviceAccount.Username, Password = _serviceAccount.Password };
+
         var tokenResponse = await httpClient.PostAsJsonAsync(_serviceAccount.TokenEndpoint, loginRequest, stoppingToken);
         tokenResponse.EnsureSuccessStatusCode();
 
-        var tokenContent = await tokenResponse.Content.ReadFromJsonAsync<LoginResponseDto>();
-        token = tokenContent?.AccessToken;
+        var tokenContent = await tokenResponse.Content.ReadFromJsonAsync<LoginResponseDto>(cancellationToken: stoppingToken);
+        var newToken = tokenContent?.AccessToken;
+        var newExpirationTime = tokenContent.ExpirationTime;
 
-        if (token == null)
-            throw new Exception("Token alýnamadý.");
+        if (string.IsNullOrEmpty(newToken))
+            throw new InvalidOperationException("Kimlik doðrulama servisinden boþ token döndü.");
 
-        var expiresIn = tokenContent.ExpirationTime - DateTime.UtcNow;// Token süresini payload'dan alabilirsin
-        var cacheExpiration = expiresIn > TimeSpan.FromMinutes(1) ? expiresIn.Subtract(TimeSpan.FromMinutes(1)) : expiresIn;
-        var options = new DistributedCacheEntryOptions
-        {
-            AbsoluteExpirationRelativeToNow = cacheExpiration
-        };   
-        await _distributedCache.SetStringAsync(tokenKey, token, options , stoppingToken);
+        // 3. Yeni token'ý ve son kullanma tarihini bir nesne olarak Redis'e kaydet.
+        //var tokenToCache = new LoginResponseDto
+        //{
+        //    AccessToken = newToken,
+        //    ExpirationTime = newExpirationTime,
+        //    RefreshToken = tokenContent.RefreshToken
+        //};
 
-        _tokenExpire = DateTime.UtcNow.Add(cacheExpiration); 
-        _bearerToken = token; // Token'ý cache'le
+        var cacheExpiration = newExpirationTime - DateTime.UtcNow;
 
-        return token;
+        await _distributedCache.SetStringAsync(
+            tokenKey,
+            JsonSerializer.Serialize(tokenContent),
+            new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = cacheExpiration },
+            stoppingToken);
+
+        _logger.LogInformation("Yeni token alýndý ve {Minutes:F1} dakika için Redis'e kaydedildi.", cacheExpiration.TotalMinutes);
+
+        return newToken;
     }
 }
