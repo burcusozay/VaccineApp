@@ -13,6 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\VaccineApp.Core\VaccineApp.Core.csproj" />
+    <ProjectReference Include="..\VaccineApp.ViewModel\VaccineApp.ViewModel.csproj" />
   </ItemGroup>
 </Project>

@@ -13,6 +13,7 @@ using VaccineApp.Business.UnitOfWork;
 using VaccineApp.Data.Context;
 using VaccineApp.DataSeed;
 using VaccineApp.ViewModel.Options;
+using VaccineApp.WebAPI.Hubs;
 
 public class Program
 {
@@ -36,7 +37,7 @@ public class Program
         builder.Services.AddScoped<AuditActionFilter>();
         builder.Services.AddHttpContextAccessor(); // Username alabilmek icin
         builder.Services.AddAutoMapper(typeof(AutoMappingProfile));
-
+        builder.Services.AddSignalR(); // SignalR Hub'lar için gerekli servisleri ekliyoruz
         builder.Services.AddComponents();
 
         var allowedOrigins = builder.Configuration["AllowedOrigins"]?.Split(",") ?? new[] { "*" };
@@ -46,7 +47,8 @@ public class Program
             {
                 policy.WithOrigins(allowedOrigins)
                       .AllowAnyHeader()
-                      .AllowAnyMethod();
+                      .AllowAnyMethod()
+                      .AllowCredentials(); // <-- EN ÖNEMLÝ EKLEME: SignalR için zorunlu
             });
         });
 
@@ -117,12 +119,14 @@ public class Program
             app.UseSwagger();
             app.UseSwaggerUI(options => { options.SwaggerEndpoint("/swagger/v1/swagger.json", "Vaccine API"); });
         }
-        app.UseHttpsRedirection();
+        app.UseHttpsRedirection(); 
+        app.UseRouting();
         app.UseMiddleware<TransactionMiddleware>();
         app.UseCors();
         app.UseAuthentication(); // Auth middleware aktif edilmeli
         app.UseAuthorization();
         app.MapControllers();
+        app.MapHub<NotificationHub>("/api/notificationhub"); // React Web Client Notification için SignalR Hub'ý ekleniyor
 
         VaccineDbSeed.SeedDatabase(app, builder.Environment.IsDevelopment());
 

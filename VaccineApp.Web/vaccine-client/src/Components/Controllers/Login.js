@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import api from "../js/api-call";
-import { useAuth } from "../js/AuthContext";
+import { useAuth } from "../../Api/AuthContext";
+import { postGeneric } from "../../Api/api-client"; 
 
 export default function Login() {
     const { login } = useAuth();
@@ -11,9 +11,10 @@ export default function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await api.post("/Account/Login", { username, password });
-            if (response.data && response.data.accessToken) {
-                login(response.data);
+            // const response = await api.post("/Account/Login", { username, password });
+            const response = await postGeneric("Account", "Login", { username, password });
+            if (response && response.accessToken) {
+                login(response);
                 setError(null);
             } else {
                 setError("Login failed.");

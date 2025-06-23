@@ -6,9 +6,9 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
-using VaccineApp.Core.Core;
 using VaccineApp.RabbitMqConsumer.Options;
 using VaccineApp.ViewModel.Dtos;
+using VaccineApp.ViewModel.Worker;
 
 namespace VaccineApp.RabbitMqConsumer
 {
