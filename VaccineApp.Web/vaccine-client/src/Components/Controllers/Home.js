@@ -163,7 +163,7 @@ const handleSave = async (itemToSave) => {
         Çıkış Yap
       </button>
 
-      <h1>Yönetim Paneli</h1>
+      <h1>Ana Sayfa</h1>
       <p>Görüntülemek istediğiniz veri türünü seçin:</p>
       <div>
         {tableConfigs.map(config => (

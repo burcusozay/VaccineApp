@@ -50,6 +50,7 @@ table.generic-table {
     padding: 8px 16px;
     border: 1px solid #dee2e6;
     background-color: #6d89d8;
+    color: white;
     cursor: pointer;
     border-radius: 5px;
     transition: all 0.2s;
@@ -76,7 +77,7 @@ table.generic-table {
     color: #6c757d;
 }
 
-/* YENİ: İşlem Butonları için Stiller */
+/* İşlem Butonları için Stiller */
 .action-button {
     padding: 6px 12px;
     border: none;
@@ -109,15 +110,16 @@ table.generic-table {
     background-color: #17a2b8;
     color: white;
 }
+
 .action-button.archive:hover {
     background-color: #138496;
 }
 
-/* YENİ: Tablo başlığı ve Ekle butonu için container */
+/* Tablo başlığı ve butonların hizalanması için */
 .table-header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    /* DÜZELTME: justify-content kaldırıldı. Hizalama artık margin ile yapılacak. */
+    align-items: center; /* Butonları ve başlığı dikeyde ortalar */
     margin-bottom: 15px;
     padding-bottom: 15px;
     border-bottom: 1px solid #e9ecef;
@@ -127,11 +129,21 @@ table.generic-table {
     margin: 0;
     font-size: 1.5em;
     color: #343a40;
+    /* DÜZELTME: Bu kural, kendisinden sonra gelen tüm elemanları sağa iter. */
+    margin-right: auto;
 }
 
-.add-new-button {
+/* Sağ üstteki butonları gruplayan ve aralarında boşluk bırakan container */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Butonlar arasına 10px boşluk ekler */
+}
+
+/* Header butonları için ortak stiller */
+.add-new-button,
+.export-excel-button {
     padding: 8px 16px;
-    background-color: #28a745;
     color: white;
     border: none;
     border-radius: 5px;
@@ -141,14 +153,18 @@ table.generic-table {
     transition: background-color 0.2s;
 }
 
-.add-new-button:hover {
-    background-color: #218838;
+.add-new-button {
+    background-color: #007bff;
+    margin-left: 10px;
 }
 
+.add-new-button:hover {
+    background-color: #0055af;
+}
 
-/* YENİ: Excel butonu için özel stil */
 .export-excel-button {
     background-color: #1d6f42; /* Excel Yeşili */
+    margin-left: 10px;
 }
 
 .export-excel-button:hover {
