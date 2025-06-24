@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using VaccineApp.Data.Entities;
-using VaccineApp.ViewModel.Dtos; 
+using VaccineApp.ViewModel.Dtos;
+using VaccineApp.ViewModel.RequestDto;
 
 namespace VaccineApp.Business.AutoMapper
 {

@@ -15,7 +15,7 @@ import { GenericPagination } from './GenericPagination';
  * @param {function} [onEdit] - Düzenle butonu tıklandığında çağrılacak fonksiyon. Satır verisini parametre olarak alır.
  * @param {function} [onDelete] - Sil butonu tıklandığında çağrılacak fonksiyon. Satır verisini parametre olarak alır.
  */
-function ServerSideDataTable({ controller, action = '', tableName, params = {}, onEdit, onDelete, onSoftDelete }) {
+function ServerSideDataTable({ controller, action = '', title, tableName, params = {}, onAdd, onEdit, onDelete, onSoftDelete }) {
   const [data, setData] = useState([]);
   const [columns, setColumns] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -127,6 +127,15 @@ function ServerSideDataTable({ controller, action = '', tableName, params = {}, 
 
   return (
     <div className="data-table-container" key={tableName}>
+       <div className="table-header">
+        <h2>{title}</h2>
+        {/* YENİ: onAdd prop'u varsa butonu render et */}
+        {onAdd && (
+          <button className="add-new-button" onClick={onAdd}>
+            + Yeni Ekle
+          </button>
+        )}
+      </div>
       {renderContent()}
       <GenericPagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
     </div>

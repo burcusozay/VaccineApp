@@ -10,6 +10,7 @@ namespace VaccineApp.ViewModel.Dtos
         public decimal? MinValue { get; set; }
         public decimal? MaxValue { get; set; }  
         public DateTime? StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
+        public DateTime? EndDate { get; set; } 
+        public long? FreezerId { get; set; }
     }
 }

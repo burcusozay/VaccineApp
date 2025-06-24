@@ -74,3 +74,22 @@ button:hover {
 .tab-button:hover:not(.active) {
     background-color: #888888; /* Hover rengi */
 }
+
+/* YENİ: Logout butonu ve container'ı için stiller */
+.home-container {
+  position: relative;
+  padding: 20px;
+}
+
+.logout-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background-color: #dc3545; /* Çıkış için kırmızı renk */
+  padding: 8px 16px;
+  font-size: 14px;
+}
+
+.logout-button:hover {
+  background-color: #c82333; /* Hover için daha koyu kırmızı */
+}

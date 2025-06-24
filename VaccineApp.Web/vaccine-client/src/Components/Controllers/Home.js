@@ -1,24 +1,71 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import ServerSideDataTable from '../BaseComponents/ServerSideDataTable';
-import EditModal from '../BaseComponents/EditModal';
+// import EditModal from '../BaseComponents/EditModal';
+import AddEditModal from '../BaseComponents/AddEditModal'; // EditModal -> AddEditModal olarak değiştirildi
 import { getDataById, postData, updateData, softDeleteData } from '../../Api/api-client';
 import { useSnackbar } from '../BaseComponents/SnakebarProvider';
+import { useAuth } from '../../Api/AuthContext'; // 'useAuth' hook'u import edildi
 import '../../style/index.css';
 
 export default function Home() {
-  const [activeTableConfig, setActiveTableConfig] = useState(null);
+
+  const tableConfigs = useMemo(() => [
+    {
+      name: 'Temperatures', controller: 'FreezerTemperature', action: 'FreezerTemperatureList', tableName: 'tblFreezerTemperatures',
+      dummyAddData: { id: 0, temperature: 0, freezerId: 1, isDeleted: false, isActive: true, createdDate: new Date().toISOString() }
+    },
+    {
+      name: 'Kullanıcılar', controller: 'User', action: '', tableName: 'tblUsers',
+      dummyAddData: { id: 0, userName: '', name: '', surname: '', email: '', phone: '', normalizeName: '', isDeleted: false, isActive: true, createdDate: new Date().toISOString() }
+    },
+    {
+      name: 'Dolaplar', controller: 'Freezer', action: 'FreezerList', tableName: 'tblVaccines',
+      dummyAddData: { id: 0, name: '', orderNo: 0, isDeleted: false, isActive: true, createdDate: new Date().toISOString() }
+    },
+  ], []);
+
+  const { logout } = useAuth(); // AuthContext'ten logout fonksiyonu alındı
+  const [activeTableConfig, setActiveTableConfig] = useState(tableConfigs[0]);
   const [parameters, setParams] = useState({ pageSize: 5 });
-  
+
   // Modal için state'ler
+  const [modalMode, setModalMode] = useState(null); // 'add' veya 'edit'
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [isLoadingItem, setIsLoadingItem] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0); // Tabloyu yenilemek için
   const showSnackbar = useSnackbar();
 
+  // "Yeni Ekle" butonuna tıklandığında çalışacak fonksiyon
+  const handleAdd = useCallback(() => {
+    if (!activeTableConfig) return;
+    setModalMode('add');
+    // Yeni kayıt için dummy datayı ayarla
+    setEditingItem(activeTableConfig.dummyAddData);
+    setIsModalOpen(true);
+  }, [activeTableConfig]);
+
+
+  // // "Düzenle" butonuna tıklandığında çalışacak fonksiyon
+  // const handleEdit = useCallback(async (row) => {
+  //   if (!activeTableConfig) return;
+  //   setIsModalOpen(true);
+  //   setIsLoadingItem(true);
+  //   try {
+  //     const fullItem = await getDataById(activeTableConfig.controller, row.id);
+  //     setEditingItem(fullItem);
+  //   } catch (error) {
+  //     showSnackbar("Kayıt detayı alınamadı.", "error");
+  //     handleCloseModal();
+  //   } finally {
+  //     setIsLoadingItem(false);
+  //   }
+  // }, [activeTableConfig, showSnackbar]);
+
    // "Düzenle" butonuna tıklandığında çalışacak fonksiyon
   const handleEdit = useCallback(async (row) => {
     if (!activeTableConfig) return;
+    setModalMode('edit');
     setIsModalOpen(true);
     setIsLoadingItem(true);
     try {
@@ -36,82 +83,100 @@ export default function Home() {
   const handleDelete = useCallback(async (row) => {
     if (!activeTableConfig) return;
     if (window.confirm(`ID: ${row.id} olan kaydı silmek istediğinizden emin misiniz?`)) {
-        try {
-            await postData(`/${activeTableConfig.controller}/Delete/${row.id}`);
-            showSnackbar("Kayıt başarıyla silindi.", "success");
-            setRefreshKey(prev => prev + 1);
-        } catch (error) {
-            showSnackbar("Kayıt silinirken bir hata oluştu.", "error");
-        }
+      try {
+        await postData(`/${activeTableConfig.controller}/Delete/${row.id}`);
+        showSnackbar("Kayıt başarıyla silindi.", "success");
+        setRefreshKey(prev => prev + 1);
+      } catch (error) {
+        showSnackbar("Kayıt silinirken bir hata oluştu.", "error");
+      }
     }
   }, [activeTableConfig, showSnackbar]);
-  
+
   /**
    * YENİ: Geçici silme (arşivleme) fonksiyonu.
    */
   const handleSoftDelete = useCallback(async (row) => {
     if (!activeTableConfig) return;
     if (window.confirm(`ID: ${row.id} olan kaydı arşivlemek istediğinizden emin misiniz?`)) {
-        try {
-            // Yeni oluşturduğumuz API fonksiyonunu çağırıyoruz.
-            await softDeleteData(activeTableConfig.controller, row.id);
-            showSnackbar("Kayıt başarıyla arşivlendi.", "success");
-            setRefreshKey(prev => prev + 1); // Tabloyu yenile
-        } catch (error) {
-            showSnackbar("Kayıt arşivlenirken bir hata oluştu.", "error");
-        }
+      try {
+        // Yeni oluşturduğumuz API fonksiyonunu çağırıyoruz.
+        await softDeleteData(activeTableConfig.controller, row.id);
+        showSnackbar("Kayıt başarıyla arşivlendi.", "success");
+        setRefreshKey(prev => prev + 1); // Tabloyu yenile
+      } catch (error) {
+        showSnackbar("Kayıt arşivlenirken bir hata oluştu.", "error");
+      }
     }
   }, [activeTableConfig, showSnackbar]);
 
-
+  // Modal kapatma fonksiyonu
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingItem(null);
+    setModalMode(null);
   };
 
-  // GÜNCELLEME: handleSave fonksiyonu artık yeni `updateData` fonksiyonunu kullanıyor.
-  // Bu, REST API best practice'lerine en uygun yöntemdir.
-  const handleSave = async (updatedItem) => {
+  // Modal'daki kaydetme fonksiyonu
+  // const handleSave = async (updatedItem) => {
+  //   if (!activeTableConfig) return;
+  //   try {
+  //     // En doğru yöntem: PUT /api/Controller/{id} isteği atılır.
+  //     await updateData(activeTableConfig.controller, updatedItem.id, updatedItem);
+  //     showSnackbar("Kayıt başarıyla güncellendi.", "success");
+  //     handleCloseModal();
+  //     setRefreshKey(prev => prev + 1);
+  //   } catch (error) {
+  //     showSnackbar("Kayıt güncellenirken bir hata oluştu.", "error");
+  //   }
+  // };
+const handleSave = async (itemToSave) => {
     if (!activeTableConfig) return;
     try {
-        // En doğru yöntem: PUT /api/Controller/{id} isteği atılır.
-        await updateData(activeTableConfig.controller, updatedItem.id, updatedItem);
+      if (modalMode === 'edit') {
+        // Düzenleme
+        await updateData(activeTableConfig.controller, itemToSave.id, itemToSave);
         showSnackbar("Kayıt başarıyla güncellendi.", "success");
-        handleCloseModal();
-        setRefreshKey(prev => prev + 1);
+      } else if (modalMode === 'add') {
+        // Ekleme
+        await postData(`/${activeTableConfig.controller}/Add`, itemToSave);
+        showSnackbar("Kayıt başarıyla eklendi.", "success");
+      }
+      handleCloseModal();
+      setRefreshKey(prev => prev + 1);
     } catch (error) {
-        showSnackbar("Kayıt güncellenirken bir hata oluştu.", "error");
+      showSnackbar(`Kayıt ${modalMode === 'edit' ? 'güncellenirken' : 'eklenirken'} bir hata oluştu.`, "error");
     }
   };
 
-  const tableConfigs = useMemo(() => [
-    { name: 'Temperatures', controller: 'FreezerTemperature', action: 'FreezerTemperatures', tableName: 'tblFreezerTemperatures' },
-    { name: 'Kullanıcılar', controller: 'User', action: '', tableName: 'tblUsers' },
-    { name: 'Aşılar', controller: 'Vaccine', action: '', tableName: 'tblVaccines' },
-  ], []);
-
-  // Sayfa ilk yüklendiğinde varsayılan tabloyu ayarla
-  useEffect(() => {
-      if (!activeTableConfig) {
-          setActiveTableConfig(tableConfigs[0]);
-      }
-  }, [activeTableConfig, tableConfigs]);
+  // // Sayfa ilk yüklendiğinde varsayılan tabloyu ayarla
+  // useEffect(() => {
+  //   if (!activeTableConfig) {
+  //     setActiveTableConfig(tableConfigs[0]);
+  //   }
+  // }, [tableConfigs]);
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div className="home-container">
+      {/* Logout Butonu */}
+      <button className="logout-button" onClick={logout}>
+        Çıkış Yap
+      </button>
+
       <h1>Yönetim Paneli</h1>
       <p>Görüntülemek istediğiniz veri türünü seçin:</p>
       <div>
         {tableConfigs.map(config => (
           <button
             key={config.tableName}
-            className={activeTableConfig?.tableName === config.tableName ? 'tab-button active' : 'tab-button'}
+            className={`tab-button ${activeTableConfig?.tableName === config.tableName ? 'active' : ''}`}
             onClick={() => setActiveTableConfig(config)}
           >
             {config.name}
           </button>
         ))}
       </div>
+
 
       {activeTableConfig && (
         <div>
@@ -123,6 +188,7 @@ export default function Home() {
             controller={activeTableConfig.controller}
             action={activeTableConfig.action}
             params={parameters}
+            onAdd={handleAdd}
             onEdit={handleEdit}
             onDelete={handleDelete}
             onSoftDelete={handleSoftDelete}
@@ -130,8 +196,17 @@ export default function Home() {
         </div>
       )}
 
-      <EditModal
+      {/* <EditModal
         isOpen={isModalOpen}
+        item={editingItem}
+        isLoading={isLoadingItem}
+        onClose={handleCloseModal}
+        onSave={handleSave}
+      /> */}
+
+      <AddEditModal
+        isOpen={isModalOpen}
+        title={modalMode === 'edit' ? 'Kayıt Düzenle' : 'Yeni Kayıt Ekle'}
         item={editingItem}
         isLoading={isLoadingItem}
         onClose={handleCloseModal}

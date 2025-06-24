@@ -8,6 +8,7 @@ using VaccineApp.Business.Repository;
 using VaccineApp.Business.UnitOfWork;
 using VaccineApp.Data.Entities;
 using VaccineApp.ViewModel.Dtos;
+using VaccineApp.ViewModel.RequestDto;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace VaccineApp.Business.Services

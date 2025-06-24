@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using VaccineApp.Business.Interfaces;
 using VaccineApp.ViewModel.Dtos;
+using VaccineApp.ViewModel.RequestDto;
 
 namespace WebAPI.Controllers
 {
@@ -24,7 +25,7 @@ namespace WebAPI.Controllers
             return Ok(stock);
         }
 
-        [HttpGet("FreezerTemperatures")]
+        [HttpGet("FreezerTemperatureList")]
         public async Task<IActionResult> GetFreezerTemperatureList([FromQuery] FreezerTemperatureRequestDto model)
         {
             var stock = await _tempratureService.GetFreezerTemperatureListAsync(model);
@@ -34,7 +35,7 @@ namespace WebAPI.Controllers
             return Ok(stock);
         }
 
-        [HttpPost("AddFreezerTemperature")]
+        [HttpPost("Add")]
         public async Task<IActionResult> AddFreezerTemperature([FromBody] FreezerTemperatureDto model)
         {
             var created = await _tempratureService.AddTemperatureAsync(model);

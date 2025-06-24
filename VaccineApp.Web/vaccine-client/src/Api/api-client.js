@@ -65,7 +65,6 @@ privateApi.interceptors.response.use(
                 const rt = getRefreshToken();
                 if (!rt) {
                     console.error("Refresh token bulunamadı. Oturum sonlandırılıyor.");
-                    // Burada AuthContext üzerinden logout çağrılabilir veya doğrudan yönlendirme yapılabilir.
                     sessionStorage.removeItem("accessToken");
                     window.location.href = '/login';
                     return Promise.reject(error);
@@ -116,15 +115,24 @@ const setupErrorInterceptor = (instance) => {
         (response) => response,
         (error) => {
             if (axios.isCancel(error) || error.config._retry) {
-                // Yeniden denenen isteklerde veya iptal edilenlerde snackbar gösterme
                 return Promise.reject(error);
             }
             if (onErrorCallback) {
-                const message =
-                    error.response?.data?.message ||
-                    error.response?.data ||
-                    "Bir hata oluştu. Lütfen daha sonra tekrar deneyin.";
-                onErrorCallback(message);
+                // YENİ: Hata mesajını güvenli bir şekilde ayrıştırarak React hatasını önlüyoruz.
+                let errorMessage = "Bir hata oluştu. Lütfen daha sonra tekrar deneyin.";
+                if (error.response?.data) {
+                    // ASP.NET Core validation problem details nesnesini kontrol et
+                    if (typeof error.response.data === 'object' && error.response.data.title) {
+                        errorMessage = error.response.data.title;
+                    } else if (typeof error.response.data.message === 'string') {
+                        errorMessage = error.response.data.message;
+                    } else if (typeof error.response.data === 'string') {
+                        errorMessage = error.response.data;
+                    }
+                } else if (error.message) {
+                    errorMessage = error.message;
+                }
+                onErrorCallback(errorMessage);
             }
             return Promise.reject(error);
         }
@@ -158,7 +166,7 @@ export async function postData(path, data = {}) {
  * @param {string} [methodName] - Opsiyonel: Kullanılacak özel bir metot adı.
  */
 export async function getDataById(controllerName, id, methodName) {
-  // DÜZELTME: Eğer methodName verilmişse URL'e eklenir, verilmemişse standart /controller/id formatı kullanılır.
+  // Eğer methodName verilmişse URL'e eklenir, verilmemişse standart /controller/id formatı kullanılır.
   const url = methodName 
     ? `/${controllerName}/${methodName}/${id}` 
     : `/${controllerName}/${id}`;
