@@ -150,8 +150,19 @@ export async function postData(path, data = {}) {
     return response.data;
 }
 
-export async function getDataById(controllerName, methodName, id) {
-  const url = `/${controllerName}/${methodName}/${id}`;
+/**
+ * GET isteği ile ID'ye göre tek bir kayıt getirir.
+ * `methodName` parametresi artık opsiyoneldir.
+ * @param {string} controllerName - API controller'ının adı.
+ * @param {string|number} id - Getirilecek kaydın ID'si.
+ * @param {string} [methodName] - Opsiyonel: Kullanılacak özel bir metot adı.
+ */
+export async function getDataById(controllerName, id, methodName) {
+  // DÜZELTME: Eğer methodName verilmişse URL'e eklenir, verilmemişse standart /controller/id formatı kullanılır.
+  const url = methodName 
+    ? `/${controllerName}/${methodName}/${id}` 
+    : `/${controllerName}/${id}`;
+  
   const response = await privateApi.get(url);
   return response.data;
 }
@@ -160,5 +171,31 @@ export async function getDataByParams(path, params = {}) {
     const finalPath = path.startsWith('/') ? path : `/${path}`;
     const url = `${finalPath}?${new URLSearchParams(params)}`;
     const response = await privateApi.get(url);
+    return response.data;
+}
+
+/**
+ * ID'ye göre bir kaynağı günceller. PUT metodunu kullanır.
+ * URL formatı: /{controllerName}/{id}
+ * @param {string} controllerName - API controller'ının adı.
+ * @param {string|number} id - Güncellenecek kaydın ID'si.
+ * @param {object} data - İsteğin gövdesinde gönderilecek güncel veri.
+ */
+export async function updateData(controllerName, id, data) {
+    const url = `/${controllerName}/${id}`;
+    const response = await privateApi.put(url, data);
+    return response.data;
+}
+
+/**
+ * ID'ye göre bir kaynağı geçici olarak siler (isDeleted = true).
+ * POST metodunu kullanır ve body göndermez.
+ * @param {string} controllerName - API controller'ının adı.
+ * @param {string|number} id - Geçici olarak silinecek kaydın ID'si.
+ */
+export async function softDeleteData(controllerName, id) {
+    const url = `/${controllerName}/SoftDelete/${id}`;
+    // Bu işlem için body göndermeye gerek yok, ID yeterlidir.
+    const response = await privateApi.post(url); 
     return response.data;
 }

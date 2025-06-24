@@ -1,3 +1,4 @@
+import '../../style/datatable.css'; // Harici CSS dosyasını import et
 export const GenericPagination = ({ currentPage, totalPages, onPageChange }) => {
   if (totalPages <= 1) return null;
   return (

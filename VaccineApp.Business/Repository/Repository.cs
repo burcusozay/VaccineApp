@@ -6,7 +6,7 @@ using VaccineApp.Data.Context;
 
 namespace VaccineApp.Business.Repository
 {
-    public class Repository<T, TKey> :  IRepository<T, TKey> where T : BaseEntity<TKey>
+    public class Repository<T, TKey> : IRepository<T, TKey> where T : BaseEntity<TKey>
     {
         private readonly AppDbContext _context;
         private readonly DbSet<T> _entities;
@@ -24,7 +24,7 @@ namespace VaccineApp.Business.Repository
 
         public async Task<IEnumerable<T>> GetAllAsync()
         {
-            return await _entities.ToListAsync();
+            return await _entities.Where(x => !x.IsDeleted).ToListAsync();
         }
 
         public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
@@ -40,7 +40,7 @@ namespace VaccineApp.Business.Repository
         public async Task<T> InsertAsync(T entity)
         {
             await _entities.AddAsync(entity);
-          
+
             return entity;
         }
 
@@ -55,7 +55,18 @@ namespace VaccineApp.Business.Repository
             _entities.Remove(entity);
             await Task.CompletedTask;
         }
-         
+
+        public async Task SoftDeleteAsync(TKey id)
+        {
+            var entity = await GetByIdAsync(id);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"Entity with id {id} not found.");
+            }
+            entity.IsDeleted = true; // Soft delete
+            await Task.CompletedTask;
+        }
+
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();

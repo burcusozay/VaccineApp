@@ -12,7 +12,8 @@ namespace VaccineApp.Business.Repository
         Task<T> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate);
         Task<T> InsertAsync(T entity);
         Task UpdateAsync(T entity);
-        Task DeleteAsync(T entity);
+        Task DeleteAsync(T entity); 
+        Task SoftDeleteAsync(TKey id); 
         Task SaveChangesAsync();
 
         //IQueryable<T> WhereIf([NotNull] this IQueryable<T> query, bool condition, Expression<Func<T, bool>> predicate);

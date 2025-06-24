@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { getDataByParams } from '../../Api/api-client';
 import '../../style/datatable.css'; // Harici CSS dosyasını import et
 import { GenericTable } from './GenericTable';
@@ -12,8 +12,10 @@ import { GenericPagination } from './GenericPagination';
  * @param {string} tableName - Bileşenin key'i için kullanılacak benzersiz isim.
  * @param {object} [params={}] - API'ye gönderilecek ek parametreler (örn: { pageSize: 20, filter: 'abc' }).
  * @param {object|null} [actionColumn=null] - Opsiyonel olarak eklenecek işlem sütunu tanımı.
+ * @param {function} [onEdit] - Düzenle butonu tıklandığında çağrılacak fonksiyon. Satır verisini parametre olarak alır.
+ * @param {function} [onDelete] - Sil butonu tıklandığında çağrılacak fonksiyon. Satır verisini parametre olarak alır.
  */
-function ServerSideDataTable({ controller, action = '', tableName, params = {}, actionColumn = null }) {
+function ServerSideDataTable({ controller, action = '', tableName, params = {}, onEdit, onDelete, onSoftDelete }) {
   const [data, setData] = useState([]);
   const [columns, setColumns] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -21,11 +23,39 @@ function ServerSideDataTable({ controller, action = '', tableName, params = {}, 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   
-  // Nesne tipindeki prop'ların her render'da yeniden oluşmasını ve
-  // useCallback'i gereksiz yere tetiklemesini önlemek için string'e çeviriyoruz.
   const paramsString = JSON.stringify(params);
   const apiUrl = action ? `/${controller}/${action}` : `/${controller}`;
-  const actionColumnString = JSON.stringify(actionColumn);
+
+  // DÜZELTME: İşlem sütununu, onEdit ve onDelete fonksiyonlarına bağlı olarak useMemo ile oluşturuyoruz.
+  // Bu, fonksiyonlar değişmediği sürece nesnenin yeniden oluşmasını engeller ve stabildir.
+  const actionColumn = useMemo(() => {
+    if (!onEdit && !onDelete) {
+      return null;
+    }
+    return {
+      Header: 'İşlemler',
+      accessor: 'actions', // Benzersiz bir accessor
+      Cell: (item) => ( // Bu bir fonksiyondur ve stringify edilmemelidir.
+        <div style={{ display: 'flex', gap: '5px' }}>
+          {onEdit && (
+            <button className="action-button edit" onClick={() => onEdit(item)}>
+              Düzenle
+            </button>
+          )}
+           {onSoftDelete && (
+            <button className="action-button archive" onClick={() => onSoftDelete(item)}>
+              Arşivle
+            </button>
+          )}
+          {onDelete && (
+            <button className="action-button delete" onClick={() => onDelete(item)}>
+              Sil
+            </button>
+          )}
+        </div>
+      )
+    };
+  }, [onEdit, onDelete, onSoftDelete]);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -52,8 +82,6 @@ function ServerSideDataTable({ controller, action = '', tableName, params = {}, 
       setData(items);
       setTotalPages(receivedTotalPages);
       
-      // ÖNEMLİ DÜZELTME: Sütunları sadece gerçekten boşken oluştur.
-      // Bu, fetchData'nın tekrar çağrılsa bile setColumns'u tetiklemesini engeller.
       if (items.length > 0 && columns.length === 0) {
         const firstItem = items[0];
         const generatedColumns = Object.keys(firstItem).map(key => ({
@@ -61,9 +89,9 @@ function ServerSideDataTable({ controller, action = '', tableName, params = {}, 
           accessor: key,
         }));
 
-        const currentActionColumn = JSON.parse(actionColumnString);
-        if (currentActionColumn) {
-          generatedColumns.push({ ...currentActionColumn, accessor: 'actions' });
+        // DÜZELTME: String'e çevrilmemiş, fonksiyon içeren orijinal actionColumn nesnesini ekliyoruz.
+        if (actionColumn) {
+          generatedColumns.push(actionColumn);
         }
         setColumns(generatedColumns);
       }
@@ -75,10 +103,9 @@ function ServerSideDataTable({ controller, action = '', tableName, params = {}, 
     } finally {
       setLoading(false);
     }
-  // DÜZELTME: useCallback'in bağımlılık dizisi, gereksiz yeniden oluşturmaları önleyecek şekilde
-  // sadece kararlı (primitive veya stringify edilmiş) değerlere bağlıdır.
-  // `columns.length` buradan kaldırılmıştır, çünkü bu sonsuz döngünün asıl nedenidir.
-  }, [apiUrl, currentPage, paramsString, actionColumnString]);
+  // DÜZELTME: Bağımlılık dizisi güncellendi. Artık `actionColumnString` yerine `actionColumn` nesnesini kullanıyoruz.
+  // Bu nesne `useMemo` ile kararlı hale getirildiği için sorun yaratmaz.
+  }, [apiUrl, currentPage, paramsString, actionColumn, columns.length]);
 
   useEffect(() => {
     fetchData();

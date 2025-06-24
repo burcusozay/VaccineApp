@@ -32,13 +32,14 @@ namespace VaccineApp.Business.Services
             return MapToDtoList(tempratureList);
         }
 
-        public async Task<ServiceResponseDto<FreezerTemperatureDto>> GetFreezerTemperaturesAsync(FreezerTemperatureRequestDto model)
+        public async Task<ServiceResponseDto<FreezerTemperatureDto>> GetFreezerTemperatureListAsync(FreezerTemperatureRequestDto model)
         {
             var query = _freezerTemperatureRepository.AsQueryable()
+                .Where(x => !x.IsDeleted)
                 .WhereIf(model.StartDate.HasValue, x => x.CreatedDate >= model.StartDate)
                 .WhereIf(model.EndDate.HasValue, x => x.CreatedDate <= model.EndDate)
                 .WhereIf(model.MinValue.HasValue && model.MinValue.Value > 0, x => x.Temperature >= model.MinValue)
-                .WhereIf(model.MaxValue.HasValue && model.MaxValue > 0, x => x.Temperature <= model.MaxValue); 
+                .WhereIf(model.MaxValue.HasValue && model.MaxValue > 0, x => x.Temperature <= model.MaxValue);
 
             // 2. Sayfalama yapmadan ÖNCE toplam kayıt sayısını al.
             var totalCount = await query.CountAsync();
@@ -58,7 +59,7 @@ namespace VaccineApp.Business.Services
 
         }
 
-        public async Task<FreezerTemperatureDto?> GetTemperatureByIdAsync(int id)
+        public async Task<FreezerTemperatureDto?> GetTemperatureByIdAsync(long id)
         {
             var tempratureDto = await _freezerTemperatureRepository.GetByIdAsync(id);
             return MapToDto(tempratureDto);
@@ -86,18 +87,20 @@ namespace VaccineApp.Business.Services
             return MapToDto(tempratureEntity); ;
         }
 
-        public async Task<FreezerTemperatureDto?> UpdateTemperatureAsync(int id, FreezerTemperatureDto model)
+        public async Task<FreezerTemperatureDto?> UpdateTemperatureAsync(long id, FreezerTemperatureDto model)
         {
             var existing = await _freezerTemperatureRepository.GetByIdAsync(id);
             if (existing is null) return null;
 
             existing.Temperature = model.Temperature;
-            // diğer alanlar güncellenebilir...
+            existing.FreezerId = model.FreezerId;
+            existing.CreatedDate = model.CreatedDate.IsNotNullOrEmpty() ? model.CreatedDate : DateTime.UtcNow; // If CreatedDate is null, use the current date
+            existing.IsDeleted = model.IsDeleted;
+            existing.IsActive = model.IsActive; // Aktiflik durumu   u 
 
-            await _unitOfWork.SaveChangesAsync();
+            await _freezerTemperatureRepository.UpdateAsync(existing);
 
             var tempratureDto = MapToDto(existing);
-
             return tempratureDto;
         }
 
@@ -107,7 +110,12 @@ namespace VaccineApp.Business.Services
             if (existing is null) return false;
 
             await _freezerTemperatureRepository.DeleteAsync(existing);
-            await _unitOfWork.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> SoftDeleteTemperatureAsync(int id)
+        {
+            await _freezerTemperatureRepository.SoftDeleteAsync(id);
             return true;
         }
     }

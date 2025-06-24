@@ -5,10 +5,10 @@ using VaccineApp.ViewModel.Dtos;
 namespace WebAPI.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")] 
+    [Route("api/[controller]")]
     public class FreezerTemperatureController : ControllerBase
     {
-        private readonly IFreezerTemperatureService _tempratureService;  
+        private readonly IFreezerTemperatureService _tempratureService;
         public FreezerTemperatureController(IFreezerTemperatureService tempratureService)
         {
             _tempratureService = tempratureService;
@@ -27,7 +27,7 @@ namespace WebAPI.Controllers
         [HttpGet("FreezerTemperatures")]
         public async Task<IActionResult> GetFreezerTemperatureList([FromQuery] FreezerTemperatureRequestDto model)
         {
-            var stock = await _tempratureService.GetFreezerTemperaturesAsync(model);
+            var stock = await _tempratureService.GetFreezerTemperatureListAsync(model);
             if (stock == null)
                 return NotFound();
 
@@ -40,5 +40,41 @@ namespace WebAPI.Controllers
             var created = await _tempratureService.AddTemperatureAsync(model);
             return CreatedAtAction(nameof(GetFreezerTemperature), new { id = created.Id }, created);
         }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateFreezerTemperature(long id, [FromBody] FreezerTemperatureDto model)
+        {
+            // İsteğe bağlı ama önerilen: URL'deki id ile body'deki id'nin aynı olduğunu kontrol et.
+            if (id != model.Id)
+            {
+                return BadRequest("URL ID ile gövde (body) ID'si uyuşmuyor.");
+            }
+
+            var updatedDto = await _tempratureService.UpdateTemperatureAsync(id, model);
+
+            if (updatedDto == null)
+            {
+                // Güncellenmek istenen kaynak bulunamadıysa.
+                return NotFound();
+            }
+
+            // DÜZELTME 2: Başarılı bir PUT isteği için 204 No Content veya 200 OK dönmek daha doğrudur.
+            return NoContent(); // Başarılı, yanıt gövdesinde içerik yok.
+            // Alternatif olarak güncellenmiş nesneyi de dönebilirsiniz: return Ok(updatedDto);
+        }
+
+        [HttpPost("Delete/{id}")]
+        public async Task<IActionResult> DeleteFreezerTemperature(int id)
+        {
+            await _tempratureService.DeleteTemperatureAsync(id);
+            return Ok();
+        }
+
+        [HttpPost("SoftDelete/{id}")]
+        public async Task<IActionResult> SoftDeleteFreezerTemperature(int id)
+        {
+            await _tempratureService.SoftDeleteTemperatureAsync(id);
+            return Ok();
+        }
     }
- }
+}
