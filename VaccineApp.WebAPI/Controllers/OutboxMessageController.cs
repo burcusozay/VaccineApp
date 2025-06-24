@@ -2,7 +2,7 @@
 using VaccineApp.Business.Interfaces;
 using VaccineApp.ViewModel.Dtos;
 
-namespace WebAPI.Controllers
+namespace VaccineApp.WebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

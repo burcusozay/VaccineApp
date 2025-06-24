@@ -1,5 +1,5 @@
 ﻿using System.Text.Json.Serialization;
-using VaccineApp.Core;
+using VaccineApp.Core.Core;
 
 namespace VaccineApp.ViewModel.Dtos
 {

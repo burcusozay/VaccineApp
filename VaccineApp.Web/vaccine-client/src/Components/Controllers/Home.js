@@ -8,7 +8,8 @@ import { useAuth } from '../../Api/AuthContext'; // 'useAuth' hook'u import edil
 import '../../style/index.css';
 
 export default function Home() {
-
+  const { authData, logout } = useAuth(); // AuthContext'ten logout fonksiyonu alındı
+  const isAdmin = authData?.role === 'admin';
   const tableConfigs = useMemo(() => [
     {
       name: 'Temperatures', controller: 'FreezerTemperature', action: 'FreezerTemperatureList', tableName: 'tblFreezerTemperatures',
@@ -24,7 +25,6 @@ export default function Home() {
     },
   ], []);
 
-  const { logout } = useAuth(); // AuthContext'ten logout fonksiyonu alındı
   const [activeTableConfig, setActiveTableConfig] = useState(tableConfigs[0]);
   const [parameters, setParams] = useState({ pageSize: 5 });
 
@@ -99,8 +99,8 @@ export default function Home() {
     setEditingItem(null);
     setModalMode(null);
   };
- 
-const handleSave = async (itemToSave) => {
+
+  const handleSave = async (itemToSave) => {
     if (!activeTableConfig) return;
     try {
       if (modalMode === 'edit') {
@@ -123,31 +123,34 @@ const handleSave = async (itemToSave) => {
    * YENİ: Excel'e Aktar butonuna tıklandığında çalışacak fonksiyon.
    */
   const handleExportExcel = useCallback(async () => {
-    if (!activeTableConfig) return;
-    
+    if (!activeTableConfig || !isAdmin) {
+      showSnackbar("Bu işlem için yetkiniz bulunmamaktadır.", "error");
+      return;
+    };
+
     showSnackbar("Excel dosyası hazırlanıyor...", "info");
     try {
-        // Sayfalama dışındaki tüm filtre parametrelerini göndererek dosyayı indir
-        const exportParams = { ...parameters };
-        delete exportParams.page;
-        delete exportParams.pageSize;
+      // Sayfalama dışındaki tüm filtre parametrelerini göndererek dosyayı indir
+      const exportParams = { ...parameters };
+      delete exportParams.page;
+      delete exportParams.pageSize;
 
-        const { fileData, fileName } = await downloadExcel(activeTableConfig.controller, exportParams);
-        
-        // Tarayıcıda indirme işlemini tetikle
-        const url = window.URL.createObjectURL(new Blob([fileData]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', fileName);
-        document.body.appendChild(link);
-        link.click();
-        link.parentNode.removeChild(link);
-        window.URL.revokeObjectURL(url);
+      const { fileData, fileName } = await downloadExcel(activeTableConfig.controller, exportParams);
+
+      // Tarayıcıda indirme işlemini tetikle
+      const url = window.URL.createObjectURL(new Blob([fileData]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url);
 
     } catch (error) {
-        showSnackbar("Excel dosyası indirilirken bir hata oluştu.", "error");
+      showSnackbar("Excel dosyası indirilirken bir hata oluştu.", "error");
     }
-  }, [activeTableConfig, parameters, showSnackbar]);
+  }, [activeTableConfig, parameters, showSnackbar, isAdmin]);
 
   // // Sayfa ilk yüklendiğinde varsayılan tabloyu ayarla
   // useEffect(() => {
@@ -192,7 +195,7 @@ const handleSave = async (itemToSave) => {
             onEdit={handleEdit}
             onDelete={handleDelete}
             onSoftDelete={handleSoftDelete}
-            onExportExcel={handleExportExcel}
+            onExportExcel={isAdmin ? handleExportExcel : null}
           />
         </div>
       )}

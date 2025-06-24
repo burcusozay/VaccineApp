@@ -118,10 +118,16 @@ const setupErrorInterceptor = (instance) => {
                 return Promise.reject(error);
             }
             if (onErrorCallback) {
-                // YENİ: Hata mesajını güvenli bir şekilde ayrıştırarak React hatasını önlüyoruz.
                 let errorMessage = "Bir hata oluştu. Lütfen daha sonra tekrar deneyin.";
-                if (error.response?.data) {
-                    // ASP.NET Core validation problem details nesnesini kontrol et
+
+                // EĞER HATA 400 VE FLUENTVALIDATION HATASI İSE:
+                if (error.response?.status === 400 && error.response.data?.errors) {
+                    const validationErrors = error.response.data.errors;
+                    // Tüm hata mesajlarını birleştir
+                    errorMessage = Object.values(validationErrors).flat().join(' ');
+                } 
+                // Diğer genel hatalar için
+                else if (error.response?.data) {
                     if (typeof error.response.data === 'object' && error.response.data.title) {
                         errorMessage = error.response.data.title;
                     } else if (typeof error.response.data.message === 'string') {
@@ -132,6 +138,7 @@ const setupErrorInterceptor = (instance) => {
                 } else if (error.message) {
                     errorMessage = error.message;
                 }
+                
                 onErrorCallback(errorMessage);
             }
             return Promise.reject(error);

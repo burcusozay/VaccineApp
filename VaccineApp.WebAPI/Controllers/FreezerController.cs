@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using VaccineApp.Business.Interfaces;
 using VaccineApp.ViewModel.Dtos;
 
-namespace WebAPI.Controllers
+namespace VaccineApp.WebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")] 
@@ -84,6 +85,7 @@ namespace WebAPI.Controllers
 
 
         [HttpPost("Excel")] // Filtreleri body'de almak için POST
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> ExportExcel([FromBody] FreezerRequestDto model)
         {
             // 1. Sayfalama olmadan filtrelenmiş tüm veriyi al

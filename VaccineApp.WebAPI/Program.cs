@@ -1,9 +1,12 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Reflection;
 using System.Text;
 using VaccineApp.Business.AutoMapper;
 using VaccineApp.Business.Base;
@@ -29,7 +32,7 @@ public class Program
         builder.Services.AddStackExchangeRedisCache(options =>
         {
             options.Configuration = builder.Configuration["Redis:ConnectionString"];
-            options.InstanceName = builder.Configuration["Redis:InstanceName"];  
+            options.InstanceName = builder.Configuration["Redis:InstanceName"];
         });
 
         builder.Services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
@@ -63,6 +66,10 @@ public class Program
                 .Build();
             options.Filters.Add(new AuthorizeFilter(policy)); // Bu politikayý global olarak uygula
         });
+
+        builder.Services.AddFluentValidationAutoValidation();
+        // Validator'larýn bulunduðu Assembly'yi (projeyi) tarar ve tüm validator'larý kaydeder.
+        builder.Services.AddValidatorsFromAssembly(Assembly.GetAssembly(typeof(VaccineApp.ViewModel.FluentValidator.FreezerTemperatureRequestValidator)));
 
         // JWT konfigürasyonu (appsettings.json -> "Jwt" section kullanýlmalý)
         var jwtConfig = builder.Configuration.GetSection("Jwt");
@@ -119,7 +126,7 @@ public class Program
             app.UseSwagger();
             app.UseSwaggerUI(options => { options.SwaggerEndpoint("/swagger/v1/swagger.json", "Vaccine API"); });
         }
-        app.UseHttpsRedirection(); 
+        app.UseHttpsRedirection();
         app.UseRouting();
         app.UseMiddleware<TransactionMiddleware>();
         app.UseCors();

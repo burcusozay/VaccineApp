@@ -1,4 +1,4 @@
-﻿namespace VaccineApp.Core
+﻿namespace VaccineApp.Core.Core
 {
     [Serializable]
     public abstract class BaseRequestDto

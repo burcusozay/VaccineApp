@@ -10,21 +10,31 @@ import { setApiErrorCallback } from "./Api/api-client";
 import { SignalRProvider } from "./Components/BaseComponents/SignalRProvider"; // Yeni provider'ı import et
 
 function PrivateRoute({ children }) {
-  const { token } = useAuth();
-  return token ? children : <Navigate to="/login" />;
+  // DÜZELTME: 'token' yerine 'authData'yı alıyoruz.
+  const { authData } = useAuth();
+  // Kontrolü 'authData'nın varlığına göre yapıyoruz.
+  return authData ? children : <Navigate to="/login" />;
 }
 
 function AppRoutes() {
-  const { token } = useAuth();
+  // DÜZELTME: 'token' yerine 'authData'yı alıyoruz.
+  const { authData } = useAuth();
   return (
     <Routes>
-      <Route path="/login"
-        element={token ? <Navigate to="/home" /> : <Login />}
+      <Route 
+        path="/login"
+        // Kontrolü 'authData'nın varlığına göre yapıyoruz.
+        element={authData ? <Navigate to="/home" /> : <Login />}
       />
-      <Route path="/home"
+      <Route 
+        path="/home"
         element={<PrivateRoute><Home /></PrivateRoute>}
       />
-      <Route path="*" element={<Navigate to={token ? "/home" : "/login"} />} />
+      <Route 
+        path="*" 
+        // Kontrolü 'authData'nın varlığına göre yapıyoruz.
+        element={<Navigate to={authData ? "/home" : "/login"} />} 
+      />
     </Routes>
   );
 }
