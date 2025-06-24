@@ -15,14 +15,14 @@ import { GenericPagination } from './GenericPagination';
  * @param {function} [onEdit] - Düzenle butonu tıklandığında çağrılacak fonksiyon. Satır verisini parametre olarak alır.
  * @param {function} [onDelete] - Sil butonu tıklandığında çağrılacak fonksiyon. Satır verisini parametre olarak alır.
  */
-function ServerSideDataTable({ controller, action = '', title, tableName, params = {}, onAdd, onEdit, onDelete, onSoftDelete }) {
+function ServerSideDataTable({ controller, action = '', title, tableName, params = {}, onAdd, onEdit, onDelete, onSoftDelete, onExportExcel }) {
   const [data, setData] = useState([]);
   const [columns, setColumns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  
+
   const paramsString = JSON.stringify(params);
   const apiUrl = action ? `/${controller}/${action}` : `/${controller}`;
 
@@ -42,7 +42,7 @@ function ServerSideDataTable({ controller, action = '', title, tableName, params
               Düzenle
             </button>
           )}
-           {onSoftDelete && (
+          {onSoftDelete && (
             <button className="action-button archive" onClick={() => onSoftDelete(item)}>
               Arşivle
             </button>
@@ -63,25 +63,25 @@ function ServerSideDataTable({ controller, action = '', title, tableName, params
 
     const baseParams = JSON.parse(paramsString);
     const finalParams = {
-        page: currentPage,
-        pageSize: 10,
-        ...baseParams,
+      page: currentPage,
+      pageSize: 10,
+      ...baseParams,
     };
-    
+
     Object.keys(finalParams).forEach(key => {
-        if (finalParams[key] === null || finalParams[key] === undefined) {
-            delete finalParams[key];
-        }
+      if (finalParams[key] === null || finalParams[key] === undefined) {
+        delete finalParams[key];
+      }
     });
 
     try {
       const result = await getDataByParams(apiUrl, finalParams);
       const items = result.Items || result.items || [];
       const receivedTotalPages = result.TotalPages || result.totalPages || 1;
-      
+
       setData(items);
       setTotalPages(receivedTotalPages);
-      
+
       if (items.length > 0 && columns.length === 0) {
         const firstItem = items[0];
         const generatedColumns = Object.keys(firstItem).map(key => ({
@@ -103,14 +103,14 @@ function ServerSideDataTable({ controller, action = '', title, tableName, params
     } finally {
       setLoading(false);
     }
-  // DÜZELTME: Bağımlılık dizisi güncellendi. Artık `actionColumnString` yerine `actionColumn` nesnesini kullanıyoruz.
-  // Bu nesne `useMemo` ile kararlı hale getirildiği için sorun yaratmaz.
+    // DÜZELTME: Bağımlılık dizisi güncellendi. Artık `actionColumnString` yerine `actionColumn` nesnesini kullanıyoruz.
+    // Bu nesne `useMemo` ile kararlı hale getirildiği için sorun yaratmaz.
   }, [apiUrl, currentPage, paramsString, actionColumn, columns.length]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
-  
+
   useEffect(() => {
     setCurrentPage(1);
     setColumns([]);
@@ -127,12 +127,18 @@ function ServerSideDataTable({ controller, action = '', title, tableName, params
 
   return (
     <div className="data-table-container" key={tableName}>
-       <div className="table-header">
+      <div className="table-header">
         <h2>{title}</h2>
         {/* YENİ: onAdd prop'u varsa butonu render et */}
         {onAdd && (
           <button className="add-new-button" onClick={onAdd}>
             + Yeni Ekle
+          </button>
+        )}
+        {/* YENİ: onExportExcel prop'u varsa butonu render et */}
+        {onExportExcel && (
+          <button className="export-excel-button" onClick={onExportExcel}>
+            Excel'e Aktar
           </button>
         )}
       </div>

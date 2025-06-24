@@ -47,9 +47,15 @@ namespace VaccineApp.Business.Services
 
             // 3. Sayfalama ve sıralamayı uygula.
             var pagedQuery = query
-                .OrderByDescending(x => x.CreatedDate)
-                .Skip((model.Page - 1) * model.PageSize) // Sayfa numarasını ve boyutunu kullan
-                .Take(model.PageSize);
+                .OrderByDescending(x => x.CreatedDate).Select(x=> x);
+
+
+            if (model.Page.HasValue && model.PageSize.HasValue)
+            {
+                pagedQuery = pagedQuery.Skip((model.Page.Value - 1) * model.PageSize.Value) // Sayfa numarasını ve boyutunu kullan
+                .Take(model.PageSize.Value); 
+            }
+
 
             // 4. Veritabanından sadece ilgili sayfadaki veriyi çek.
             var pagedItems = await pagedQuery.ToListAsync();

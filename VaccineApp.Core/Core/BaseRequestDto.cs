@@ -3,8 +3,8 @@
     [Serializable]
     public abstract class BaseRequestDto
     {  
-        public int PageSize { get; set; } = 10;
-        public int Page { get; set; } = 0;
+        public int? PageSize { get; set; }
+        public int? Page { get; set; }
         public bool IsDeleted { get; set; } = false;
         public bool IsActive { get; set; } = true; 
     }

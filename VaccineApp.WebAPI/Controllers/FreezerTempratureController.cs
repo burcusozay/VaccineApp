@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using VaccineApp.Business.Interfaces;
+using VaccineApp.Business.Services;
 using VaccineApp.ViewModel.Dtos;
 using VaccineApp.ViewModel.RequestDto;
 
@@ -9,10 +10,12 @@ namespace WebAPI.Controllers
     [Route("api/[controller]")]
     public class FreezerTemperatureController : ControllerBase
     {
-        private readonly IFreezerTemperatureService _tempratureService;
-        public FreezerTemperatureController(IFreezerTemperatureService tempratureService)
+        private readonly IFreezerTemperatureService _tempratureService; 
+        private readonly IExcelService _excelService; // Excel servisini inject et
+        public FreezerTemperatureController(IFreezerTemperatureService tempratureService, IExcelService excelService)
         {
             _tempratureService = tempratureService;
+            _excelService = excelService;
         }
 
         [HttpGet("{id}")]
@@ -76,6 +79,20 @@ namespace WebAPI.Controllers
         {
             await _tempratureService.SoftDeleteTemperatureAsync(id);
             return Ok();
+        }
+
+        [HttpPost("Excel")] // Filtreleri body'de almak için POST
+        public async Task<IActionResult> ExportExcel([FromBody] FreezerTemperatureRequestDto model)
+        {
+            // 1. Sayfalama olmadan filtrelenmiş tüm veriyi al
+            var dataToExport = await _tempratureService.GetFreezerTemperatureListAsync(model);
+
+            // 2. Excel servisi ile dosyayı byte dizisine çevir
+            var fileBytes = await _excelService.ExportToExcelAsync(dataToExport.Items, "Sıcaklık Değerleri");
+
+            // 3. Dosyayı kullanıcıya gönder
+            string fileName = $"Excel_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
+            return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
     }
 }

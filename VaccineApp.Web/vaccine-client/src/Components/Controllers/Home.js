@@ -2,7 +2,7 @@ import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import ServerSideDataTable from '../BaseComponents/ServerSideDataTable';
 // import EditModal from '../BaseComponents/EditModal';
 import AddEditModal from '../BaseComponents/AddEditModal'; // EditModal -> AddEditModal olarak değiştirildi
-import { getDataById, postData, updateData, softDeleteData } from '../../Api/api-client';
+import { getDataById, postData, updateData, softDeleteData, downloadExcel } from '../../Api/api-client';
 import { useSnackbar } from '../BaseComponents/SnakebarProvider';
 import { useAuth } from '../../Api/AuthContext'; // 'useAuth' hook'u import edildi
 import '../../style/index.css';
@@ -45,24 +45,7 @@ export default function Home() {
     setIsModalOpen(true);
   }, [activeTableConfig]);
 
-
-  // // "Düzenle" butonuna tıklandığında çalışacak fonksiyon
-  // const handleEdit = useCallback(async (row) => {
-  //   if (!activeTableConfig) return;
-  //   setIsModalOpen(true);
-  //   setIsLoadingItem(true);
-  //   try {
-  //     const fullItem = await getDataById(activeTableConfig.controller, row.id);
-  //     setEditingItem(fullItem);
-  //   } catch (error) {
-  //     showSnackbar("Kayıt detayı alınamadı.", "error");
-  //     handleCloseModal();
-  //   } finally {
-  //     setIsLoadingItem(false);
-  //   }
-  // }, [activeTableConfig, showSnackbar]);
-
-   // "Düzenle" butonuna tıklandığında çalışacak fonksiyon
+  // "Düzenle" butonuna tıklandığında çalışacak fonksiyon
   const handleEdit = useCallback(async (row) => {
     if (!activeTableConfig) return;
     setModalMode('edit');
@@ -116,20 +99,7 @@ export default function Home() {
     setEditingItem(null);
     setModalMode(null);
   };
-
-  // Modal'daki kaydetme fonksiyonu
-  // const handleSave = async (updatedItem) => {
-  //   if (!activeTableConfig) return;
-  //   try {
-  //     // En doğru yöntem: PUT /api/Controller/{id} isteği atılır.
-  //     await updateData(activeTableConfig.controller, updatedItem.id, updatedItem);
-  //     showSnackbar("Kayıt başarıyla güncellendi.", "success");
-  //     handleCloseModal();
-  //     setRefreshKey(prev => prev + 1);
-  //   } catch (error) {
-  //     showSnackbar("Kayıt güncellenirken bir hata oluştu.", "error");
-  //   }
-  // };
+ 
 const handleSave = async (itemToSave) => {
     if (!activeTableConfig) return;
     try {
@@ -148,6 +118,36 @@ const handleSave = async (itemToSave) => {
       showSnackbar(`Kayıt ${modalMode === 'edit' ? 'güncellenirken' : 'eklenirken'} bir hata oluştu.`, "error");
     }
   };
+
+  /**
+   * YENİ: Excel'e Aktar butonuna tıklandığında çalışacak fonksiyon.
+   */
+  const handleExportExcel = useCallback(async () => {
+    if (!activeTableConfig) return;
+    
+    showSnackbar("Excel dosyası hazırlanıyor...", "info");
+    try {
+        // Sayfalama dışındaki tüm filtre parametrelerini göndererek dosyayı indir
+        const exportParams = { ...parameters };
+        delete exportParams.page;
+        delete exportParams.pageSize;
+
+        const { fileData, fileName } = await downloadExcel(activeTableConfig.controller, exportParams);
+        
+        // Tarayıcıda indirme işlemini tetikle
+        const url = window.URL.createObjectURL(new Blob([fileData]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', fileName);
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode.removeChild(link);
+        window.URL.revokeObjectURL(url);
+
+    } catch (error) {
+        showSnackbar("Excel dosyası indirilirken bir hata oluştu.", "error");
+    }
+  }, [activeTableConfig, parameters, showSnackbar]);
 
   // // Sayfa ilk yüklendiğinde varsayılan tabloyu ayarla
   // useEffect(() => {
@@ -192,6 +192,7 @@ const handleSave = async (itemToSave) => {
             onEdit={handleEdit}
             onDelete={handleDelete}
             onSoftDelete={handleSoftDelete}
+            onExportExcel={handleExportExcel}
           />
         </div>
       )}

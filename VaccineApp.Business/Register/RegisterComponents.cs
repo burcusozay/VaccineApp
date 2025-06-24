@@ -26,7 +26,7 @@ namespace VaccineApp.Business.Register
             services.AddScoped<IAuditService, AuditService>();
             services.AddScoped<IOutboxMessageService, OutboxMessageService>();
             services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
-
+            services.AddScoped<IExcelService, ExcelService>();
             #endregion
         }
     }

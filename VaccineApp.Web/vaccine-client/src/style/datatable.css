@@ -144,3 +144,13 @@ table.generic-table {
 .add-new-button:hover {
     background-color: #218838;
 }
+
+
+/* YENİ: Excel butonu için özel stil */
+.export-excel-button {
+    background-color: #1d6f42; /* Excel Yeşili */
+}
+
+.export-excel-button:hover {
+    background-color: #165934;
+}

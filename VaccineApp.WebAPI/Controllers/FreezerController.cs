@@ -10,10 +10,12 @@ namespace WebAPI.Controllers
     {
         private readonly ILogger<FreezerController> _logger;
         private readonly IFreezerService _freezerService;
-        public FreezerController(ILogger<FreezerController> logger, IFreezerService freezerService)
+        private readonly IExcelService _excelService; // Excel servisini inject et
+        public FreezerController(ILogger<FreezerController> logger, IFreezerService freezerService, IExcelService excelService)
         {
             _logger = logger;
             _freezerService = freezerService;
+            _excelService = excelService;
         }
 
 
@@ -78,6 +80,21 @@ namespace WebAPI.Controllers
         {
             await _freezerService.SoftDeleteFreezerAsync(id);
             return Ok();
+        }
+
+
+        [HttpPost("Excel")] // Filtreleri body'de almak için POST
+        public async Task<IActionResult> ExportExcel([FromBody] FreezerRequestDto model)
+        {
+            // 1. Sayfalama olmadan filtrelenmiş tüm veriyi al
+            var dataToExport = await _freezerService.GetFreezerListAsync(model);
+
+            // 2. Excel servisi ile dosyayı byte dizisine çevir
+            var fileBytes = await _excelService.ExportToExcelAsync(dataToExport.Items);
+
+            // 3. Dosyayı kullanıcıya gönder
+            string fileName = $"Excel_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
+            return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
     }
 }

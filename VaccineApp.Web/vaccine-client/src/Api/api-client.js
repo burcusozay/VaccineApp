@@ -207,3 +207,31 @@ export async function softDeleteData(controllerName, id) {
     const response = await privateApi.post(url); 
     return response.data;
 }
+
+/**
+ * YENİ: Filtre parametreleri ile Excel dosyası indirme isteği atar.
+ * @param {string} controllerName - API controller'ının adı.
+ * @param {object} params - Filtreleme için request body'si olarak gönderilecek veri.
+ * @returns {Promise<{fileData: Blob, fileName: string}>} - Dosya verisi ve adını içeren nesne.
+ */
+export async function downloadExcel(controllerName, params = {}) {
+    const url = `/${controllerName}/Excel`;
+    
+    // Yanıt tipini 'blob' olarak ayarlayarak dosyayı indirmeye hazırlıyoruz.
+    const response = await privateApi.post(url, params, { responseType: 'blob' });
+
+    // Dosya adını 'Content-Disposition' başlığından almaya çalışıyoruz.
+    let fileName = 'export.xlsx'; // Varsayılan dosya adı
+    const contentDisposition = response.headers['content-disposition'];
+    if (contentDisposition) {
+        const fileNameMatch = contentDisposition.match(/filename="(.+)"/);
+        if (fileNameMatch.length > 1) {
+            fileName = fileNameMatch[1];
+        }
+    }
+    
+    return {
+        fileData: response.data,
+        fileName: fileName
+    };
+}

@@ -26,28 +26,26 @@ namespace VaccineApp.ViewModel.Dtos
         /// <summary>
         /// Toplam sayfa sayısı.
         /// </summary>
-        public int TotalPages { get; set; }
+        public int TotalPages { get; set; } = 0;
 
         /// <summary>
         /// Filtrelenmiş toplam kayıt sayısı.
         /// </summary>
-        public int TotalCount { get; set; }
+        public int TotalCount { get; set; }  = 0;
 
         public ServiceResponseDto()
         {
             Items = new List<T>();
             CurrentPage = 1;
-            TotalPages = 0;
-            TotalCount = 0;
         }
 
-        public ServiceResponseDto(List<T> items, int count, int pageNumber, int pageSize) : this()
+        public ServiceResponseDto(List<T> items, int count, int? pageNumber, int? pageSize) : this()
         {
             TotalCount = count;
-            CurrentPage = pageNumber;
+            CurrentPage = pageNumber.HasValue ? pageNumber.Value : 1;
             Items = items;
             // Toplam sayfa sayısını hesapla
-            TotalPages = (int)Math.Ceiling(count / (double)pageSize);
+            TotalPages = pageSize.HasValue ? (int)Math.Ceiling(count / (double)pageSize) : 0;
         }
     }
 }
