@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VaccineApp.Business.Interfaces;
-using VaccineApp.ViewModel.Dtos;
 using VaccineApp.ViewModel.Options;
+using VaccineApp.ViewModel.RequestDto;
 
 namespace WebAPI.Controllers
 {

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Text.Json;
 using VaccineApp.Business.Base;
 using VaccineApp.Business.Interfaces;
@@ -7,6 +8,7 @@ using VaccineApp.Business.Repository;
 using VaccineApp.Business.UnitOfWork;
 using VaccineApp.Data.Entities;
 using VaccineApp.ViewModel.Dtos;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace VaccineApp.Business.Services
 {
@@ -28,6 +30,32 @@ namespace VaccineApp.Business.Services
         {
             var tempratureList = await _freezerTemperatureRepository.GetAllAsync();
             return MapToDtoList(tempratureList);
+        }
+
+        public async Task<ServiceResponseDto<FreezerTemperatureDto>> GetFreezerTemperaturesAsync(FreezerTemperatureRequestDto model)
+        {
+            var query = _freezerTemperatureRepository.AsQueryable()
+                .WhereIf(model.StartDate.HasValue, x => x.CreatedDate >= model.StartDate)
+                .WhereIf(model.EndDate.HasValue, x => x.CreatedDate <= model.EndDate)
+                .WhereIf(model.MinValue.HasValue && model.MinValue.Value > 0, x => x.Temperature >= model.MinValue)
+                .WhereIf(model.MaxValue.HasValue && model.MaxValue > 0, x => x.Temperature <= model.MaxValue); 
+
+            // 2. Sayfalama yapmadan ÖNCE toplam kayıt sayısını al.
+            var totalCount = await query.CountAsync();
+
+            // 3. Sayfalama ve sıralamayı uygula.
+            var pagedQuery = query
+                .OrderByDescending(x => x.CreatedDate)
+                .Skip((model.Page - 1) * model.PageSize) // Sayfa numarasını ve boyutunu kullan
+                .Take(model.PageSize);
+
+            // 4. Veritabanından sadece ilgili sayfadaki veriyi çek.
+            var pagedItems = await pagedQuery.ToListAsync();
+
+            var items = MapToDtoList(pagedItems).ToList();
+
+            return new ServiceResponseDto<FreezerTemperatureDto>(items, totalCount, model.Page, model.PageSize);
+
         }
 
         public async Task<FreezerTemperatureDto?> GetTemperatureByIdAsync(int id)

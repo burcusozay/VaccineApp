@@ -8,6 +8,8 @@ const api = axios.create({
   },
 });
 
+
+
 // Token otomatik eklenmesi
 api.interceptors.request.use((config) => {
   // Sadece /login'e token eklenmez

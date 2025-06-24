@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using VaccineApp.Core;
 
-namespace VaccineApp.ViewModel.Dtos
+namespace VaccineApp.ViewModel.RequestDto
 {
     public class LoginRequestDto 
     {

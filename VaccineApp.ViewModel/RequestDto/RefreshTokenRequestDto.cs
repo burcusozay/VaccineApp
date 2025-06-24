@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace VaccineApp.ViewModel.Dtos
+namespace VaccineApp.ViewModel.RequestDto
 {
     public class RefreshTokenRequestDto
     {

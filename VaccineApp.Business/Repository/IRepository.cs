@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Linq.Expressions;
 using VaccineApp.Core;
 
 namespace VaccineApp.Business.Repository
@@ -13,6 +14,8 @@ namespace VaccineApp.Business.Repository
         Task UpdateAsync(T entity);
         Task DeleteAsync(T entity);
         Task SaveChangesAsync();
+
+        //IQueryable<T> WhereIf([NotNull] this IQueryable<T> query, bool condition, Expression<Func<T, bool>> predicate);
 
         IQueryable<T> AsQueryable();
         // Alternatif olarak, filtreli bir IQueryable döndürmek isterseniz:

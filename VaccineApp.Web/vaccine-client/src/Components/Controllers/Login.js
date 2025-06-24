@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../../Api/AuthContext";
-import { postGeneric } from "../../Api/api-client"; 
+import { loginUser } from "../../Api/api-client"; 
 
 export default function Login() {
     const { login } = useAuth();
@@ -12,7 +12,7 @@ export default function Login() {
         e.preventDefault();
         try {
             // const response = await api.post("/Account/Login", { username, password });
-            const response = await postGeneric("Account", "Login", { username, password });
+            const response = await loginUser({ username, password });
             if (response && response.accessToken) {
                 login(response);
                 setError(null);

@@ -1,65 +1,164 @@
-// src/js/api-client.js
 import axios from "axios";
 
 export const BASE_URL = process.env.REACT_APP_API_URL || "https://localhost:44395/api";
 
-// AccessToken’i localStorage’dan çekiyoruz. Dilersen props/context ile de verebilirsin.
-function getAccessToken() {
-    // return localStorage.getItem("accessToken");
+// Helper fonksiyonları: Token verisini sessionStorage'dan güvenli bir şekilde alır.
+function getTokenData() {
     const tokenDataString = sessionStorage.getItem("accessToken");
     if (!tokenDataString) return null;
-
     try {
-        const tokenData = JSON.parse(tokenDataString);
-        return tokenData?.accessToken; // Token objesinin içindeki accessToken'ı döndür
+        return JSON.parse(tokenDataString);
     } catch (e) {
-        console.error("Access token parse edilemedi.", e);
+        console.error("Token verisi parse edilemedi.", e);
         return null;
     }
 }
 
-// Axios örneği oluştur
-const api = axios.create({
+function getAccessToken() {
+    return getTokenData()?.accessToken;
+}
+
+function getRefreshToken() {
+    return getTokenData()?.refreshToken;
+}
+
+// ===================================================================
+// API İstemcileri (Public ve Private)
+// ===================================================================
+const publicApi = axios.create({
     baseURL: BASE_URL,
-    headers: {
-        "Content-Type": "application/json",
+    headers: { "Content-Type": "application/json" },
+});
+
+const privateApi = axios.create({
+    baseURL: BASE_URL,
+    headers: { "Content-Type": "application/json" },
+});
+
+// ===================================================================
+// Private API Interceptor'ları (Token Ekleme ve Yenileme Mantığı)
+// ===================================================================
+
+// 1. İstek Interceptor'ı: Her isteğe token ekler.
+privateApi.interceptors.request.use(
+    (config) => {
+        const token = getAccessToken();
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
     },
-});
+    (error) => Promise.reject(error)
+);
 
-// Request interceptor (token ekleme)
-api.interceptors.request.use((config) => {
-    const token = getAccessToken();
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+// 2. Yanıt Interceptor'ı: 401 hatasını yakalar ve token yenilemeyi dener.
+privateApi.interceptors.response.use(
+    (response) => response, // Başarılı yanıtları doğrudan döndür
+    async (error) => {
+        const originalRequest = error.config;
+        
+        // Eğer hata 401 ise ve bu istek daha önce denenmediyse
+        if (error.response?.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true; // İsteği 'denendi' olarak işaretle (sonsuz döngüyü önler)
+            
+            try {
+                const rt = getRefreshToken();
+                if (!rt) {
+                    console.error("Refresh token bulunamadı. Oturum sonlandırılıyor.");
+                    // Burada AuthContext üzerinden logout çağrılabilir veya doğrudan yönlendirme yapılabilir.
+                    sessionStorage.removeItem("accessToken");
+                    window.location.href = '/login';
+                    return Promise.reject(error);
+                }
+
+                console.log("Access token süresi doldu. Yenisi isteniyor...");
+                
+                // Token yenileme isteği, token gerektirmediği için publicApi ile yapılır.
+                const response = await publicApi.post('/Account/RefreshToken', { refreshToken: rt });
+                const newTokens = response.data;
+
+                // Yeni token'ları kaydet
+                sessionStorage.setItem("accessToken", JSON.stringify(newTokens));
+                
+                console.log("Yeni token alındı. Orijinal istek tekrarlanıyor.");
+                
+                // Orijinal isteğin başlığını yeni token ile güncelle
+                originalRequest.headers.Authorization = `Bearer ${newTokens.accessToken}`;
+                
+                // Orijinal isteği yeni token ile tekrar gönder
+                return privateApi(originalRequest);
+
+            } catch (_error) {
+                // Refresh token da geçersizse veya başka bir hata oluşursa
+                console.error("Refresh token ile yeni token alınamadı.", _error);
+                sessionStorage.removeItem("accessToken");
+                window.location.href = '/login';
+                return Promise.reject(_error);
+            }
+        }
+        
+        // Diğer tüm hataları reddet
+        return Promise.reject(error);
     }
-    return config;
-});
+);
 
-// Response interceptor (hata yönetimi, snakebar tetiklenmesi üstten)
+
+// ===================================================================
+// Genel Hata Yönetimi (Snackbar için)
+// ===================================================================
 let onErrorCallback = null;
 export function setApiErrorCallback(cb) {
     onErrorCallback = cb;
 }
 
-api.interceptors.response.use(
-    (response) => response,
-    (error) => {
-        if (onErrorCallback) {
-            const message =
-                error.response?.data ||
-                error.response?.data?.message ||
-                error.message ||
-                "Bilinmeyen bir hata oluştu";
-            onErrorCallback(message);
+const setupErrorInterceptor = (instance) => {
+    instance.interceptors.response.use(
+        (response) => response,
+        (error) => {
+            if (axios.isCancel(error) || error.config._retry) {
+                // Yeniden denenen isteklerde veya iptal edilenlerde snackbar gösterme
+                return Promise.reject(error);
+            }
+            if (onErrorCallback) {
+                const message =
+                    error.response?.data?.message ||
+                    error.response?.data ||
+                    "Bir hata oluştu. Lütfen daha sonra tekrar deneyin.";
+                onErrorCallback(message);
+            }
+            return Promise.reject(error);
         }
-        return Promise.reject(error);
-    }
-);
+    );
+};
 
-// **Generic POST** metodu
-export async function postGeneric(controllerName, methodName, data = {}) {
-    // Örn: /User/Login gibi endpointler için
-    const url = `/${controllerName}/${methodName}`;
-    const response = await api.post(url, data);
+setupErrorInterceptor(publicApi);
+setupErrorInterceptor(privateApi); // Bu, refresh sonrası hataları yakalar
+
+
+// ===================================================================
+// DIŞARI AKTARILAN API FONKSİYONLARI
+// ===================================================================
+
+export async function loginUser(credentials) {
+    const response = await publicApi.post("/Account/Login", credentials);
+    return response.data;
+}
+
+export async function postData(path, data = {}) {
+    const finalPath = path.startsWith('/') ? path : `/${path}`;
+    const response = await privateApi.post(finalPath, data);
+    return response.data;
+}
+
+export async function getDataById(controllerName, methodName, id) {
+  const url = `/${controllerName}/${methodName}/${id}`;
+  const response = await privateApi.get(url);
+  return response.data;
+}
+
+export async function getDataByParams(path, params = {}) {
+    const finalPath = path.startsWith('/') ? path : `/${path}`;
+    const url = `${finalPath}?${new URLSearchParams(params)}`;
+    const response = await privateApi.get(url);
     return response.data;
 }

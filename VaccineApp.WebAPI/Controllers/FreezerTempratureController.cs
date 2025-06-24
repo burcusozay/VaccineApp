@@ -24,6 +24,16 @@ namespace WebAPI.Controllers
             return Ok(stock);
         }
 
+        [HttpGet("FreezerTemperatures")]
+        public async Task<IActionResult> GetFreezerTemperatureList([FromQuery] FreezerTemperatureRequestDto model)
+        {
+            var stock = await _tempratureService.GetFreezerTemperaturesAsync(model);
+            if (stock == null)
+                return NotFound();
+
+            return Ok(stock);
+        }
+
         [HttpPost("AddFreezerTemperature")]
         public async Task<IActionResult> AddFreezerTemperature([FromBody] FreezerTemperatureDto model)
         {
