@@ -34,8 +34,11 @@ appSettings.Develeopment.json
   "ConnectionStrings": {
     "PostgresConnection": "Host=localhost;Database=vaccinedb;Username=postgres;Password=1234qqq"
   },"Redis": {
-    "ConnectionString": "localhost:6379", // Redis sunucunuza göre ayarlayın
+    "ConnectionString": "localhost:6379", // adjust for your Redis server info
     "InstanceName": "VaccineCache:"
   },"AllowedOrigins": "http://localhost:3000,https://localhost:44395"
 }
 </code></pre>
+
+<strong><em>Error Info: If you get an error like below. Please use longer SecretKey.
+IDX10720: Unable to create KeyedHashAlgorithm for algorithm 'HS256', the key size must be greater than: '256' bits, key has '232' bits.</em></strong> 
