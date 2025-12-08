@@ -1,5 +1,6 @@
 # Vaccine
-<p> cd .\Vaccine </p>
+<p> .NET CLI (VisualStudio > View > Terminal > cd ./{ProjectName}) </p>
+<p>  cd .\Vaccine </p>
 
 ## DB Context Paketleri
 <p> dotnet add package Microsoft.EntityFrameworkCore (For DataLayer.proj and VaccineApp.API.proj proj both) </p>
