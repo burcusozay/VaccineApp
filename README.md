@@ -60,3 +60,6 @@
 </code></pre>
 ## Dependency Injection  
 <p>dotnet add package Microsoft.Extensions.DependencyInjection.Abstractions</p>
+
+## Fluent Validation
+<p>dotnet add package FluentValidation.AspNetCore (ModelView.proj and WebAPI.proj)</p>
