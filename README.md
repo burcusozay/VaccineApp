@@ -58,4 +58,5 @@
  }
 </code></pre>
 ## Dependency Injection 
+<p>dotnet add package AutoMapper.Extensions.Microsoft.DependencyInjection</p>
 <p>dotnet add package Microsoft.Extensions.DependencyInjection.Abstractions</p>
