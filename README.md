@@ -1,5 +1,5 @@
 # Vaccine
-<p> .NET CLI (VisualStudio > View > Terminal > cd ./{ProjectName}) </p>
+<p> .NET CLI (VisualStudio > View > Terminal > cd .\{ProjectName}) </p>
 <p>  cd .\Vaccine </p>
 
 ## DB Context Paketleri
