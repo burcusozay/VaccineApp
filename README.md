@@ -40,5 +40,5 @@ appSettings.Develeopment.json
 }
 </code></pre>
 
-<strong><em>Error Info: If you get an error like below. Please use longer SecretKey.
-IDX10720: Unable to create KeyedHashAlgorithm for algorithm 'HS256', the key size must be greater than: '256' bits, key has '232' bits.</em></strong> 
+<strong><em><p>Error Info: If you get an error like below. Please use longer SecretKey.</p>
+<p>IDX10720: Unable to create KeyedHashAlgorithm for algorithm 'HS256', the key size must be greater than: '256' bits, key has '232' bits.</p></em></strong> 
