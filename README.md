@@ -1,6 +1,7 @@
 # Vaccine
-## DB Context Paketleri
 <p> cd .\Vaccine </p>
+
+## DB Context Paketleri
 <p> dotnet add package Microsoft.EntityFrameworkCore </p>
 <p> dotnet add package Npgsql.EntityFrameworkCore.PostgreSQL </p>
 <p> dotnet add package Microsoft.EntityFrameworkCore.Design </p>
