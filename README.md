@@ -14,10 +14,10 @@
 ## Auto Mapper
 <p> dotnet add package AutoMapper </p>
 
-## Swagger
+## API Swagger
 <p> dotnet add package Swashbuckle.AspNetCore </p>
+<strong>appSettings.Develeopment.json</strong>
 <pre><code class="language-json">
-appSettings.Develeopment.json
 {
   "Logging": {
     "LogLevel": {
@@ -42,3 +42,17 @@ appSettings.Develeopment.json
 
 <strong><em><p>Error Info: If you get an error like below. Please use longer SecretKey.</p>
 <p>IDX10720: Unable to create KeyedHashAlgorithm for algorithm 'HS256', the key size must be greater than: '256' bits, key has '232' bits.</p></em></strong> 
+
+<strong>lunchSettings.json</strong>
+<strong><em><p>To Open WebAPI Swagger Automatically lunchSettings.json this code should be added like this below</p></em></strong> 
+
+<pre><code class="language-json">
+  "IIS Express": {
+   "commandName": "IISExpress",
+   "launchBrowser": true,
+   "environmentVariables": {
+     "ASPNETCORE_ENVIRONMENT": "Development"
+   },
+   "launchUrl": "swagger"
+ }
+</code></pre>
