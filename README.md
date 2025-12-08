@@ -7,4 +7,4 @@
 <p> dotnet add package Microsoft.EntityFrameworkCore.Relational </p>
 <p> dotnet add package Microsoft.EntityFrameworkCore.Tools </p>
 <p> dotnet tool install --global dotnet-ef </p>
-</hr>
+<hr>
