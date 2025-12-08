@@ -1,5 +1,5 @@
 # Vaccine
-1. dotnet add package Microsoft.EntityFrameworkCore
-2. dotnet add package Npgsql.EntityFrameworkCore.PostgreSQL
-3. dotnet add package Microsoft.EntityFrameworkCore.Design
-4. dotnet add package Npgsql
+<p> dotnet add package Microsoft.EntityFrameworkCore </p>
+<p> dotnet add package Npgsql.EntityFrameworkCore.PostgreSQL </p>
+<p> dotnet add package Microsoft.EntityFrameworkCore.Design </p>
+<p> dotnet add package Npgsql </p>
