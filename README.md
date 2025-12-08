@@ -40,11 +40,11 @@
 }
 </code></pre>
 
-<strong><em><p>Error Info: If you get an error like below. Please use longer SecretKey.</p>
-<p>IDX10720: Unable to create KeyedHashAlgorithm for algorithm 'HS256', the key size must be greater than: '256' bits, key has '232' bits.</p></em></strong> 
+<em><p>Error Info: If you get an error like below. Please use longer SecretKey.</p></em>
+<strong><p>IDX10720: Unable to create KeyedHashAlgorithm for algorithm 'HS256', the key size must be greater than: '256' bits, key has '232' bits.</p></strong> 
 
 <strong>lunchSettings.json</strong>
-<strong><em><p>To Open WebAPI Swagger Automatically lunchSettings.json this code should be added like this below</p></em></strong> 
+<em><p>To Open WebAPI Swagger Automatically lunchSettings.json this code should be added like this below</p></em>
 
 <pre><code class="language-json">
   "IIS Express": {
