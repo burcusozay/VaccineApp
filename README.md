@@ -11,7 +11,7 @@
 <p> dotnet add package Microsoft.EntityFrameworkCore.Tools (migration update-database DataLayer.proj) </p>
 <p> dotnet add package Microsoft.Extensions.Configuration.Json </p>
 <p> dotnet add package Microsoft.EntityFrameworkCore.Design </p>
-<p> dotnet tool install --global dotnet-ef </p>
+<p> dotnet tool install --global dotnet-ef (for development settings json. arrangement of development enviroment variable)</p>
 <hr>
 
 ## Auto Mapper
