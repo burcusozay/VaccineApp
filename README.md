@@ -9,6 +9,8 @@
 <p> dotnet add package Npgsql </p>
 <p> dotnet add package Microsoft.EntityFrameworkCore.Relational </p>
 <p> dotnet add package Microsoft.EntityFrameworkCore.Tools (migration update-database DataLayer.proj) </p>
+<p> dotnet add package Microsoft.Extensions.Configuration.Json </p>
+<p> dotnet add package Microsoft.EntityFrameworkCore.Design </p>
 <p> dotnet tool install --global dotnet-ef </p>
 <hr>
 
@@ -42,7 +44,7 @@
 }
 </code></pre>
 
-<em><p>Error Info: If you get an error like below. Please use longer SecretKey.</p></em>
+<em><p>Error Info: If you get an error like below, Please use longer SecretKey.</p></em>
 <strong><p>IDX10720: Unable to create KeyedHashAlgorithm for algorithm 'HS256', the key size must be greater than: '256' bits, key has '232' bits.</p></strong> 
 
 <strong>lunchSettings.json</strong>
