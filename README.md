@@ -9,5 +9,6 @@
 <p> dotnet add package Microsoft.EntityFrameworkCore.Tools </p>
 <p> dotnet tool install --global dotnet-ef </p>
 <hr>
+
 ## Auto Mapper
 <p> dotnet add package AutoMapper </p>
