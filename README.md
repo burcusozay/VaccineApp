@@ -15,7 +15,6 @@
 <hr>
 
 ## Auto Mapper
-<p> dotnet add package AutoMapper </p>
 <p> dotnet add package AutoMapper.Extensions.Microsoft.DependencyInjection </p>
 
 ## API Swagger
