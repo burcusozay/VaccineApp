@@ -14,6 +14,7 @@
 
 ## Auto Mapper
 <p> dotnet add package AutoMapper </p>
+<p> dotnet add package AutoMapper.Extensions.Microsoft.DependencyInjection </p>
 
 ## API Swagger
 <p> dotnet add package Swashbuckle.AspNetCore </p>
@@ -57,6 +58,5 @@
    "launchUrl": "swagger"
  }
 </code></pre>
-## Dependency Injection 
-<p>dotnet add package AutoMapper.Extensions.Microsoft.DependencyInjection</p>
+## Dependency Injection  
 <p>dotnet add package Microsoft.Extensions.DependencyInjection.Abstractions</p>
