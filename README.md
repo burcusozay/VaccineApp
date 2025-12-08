@@ -16,3 +16,26 @@
 
 ## Swagger
 <p> dotnet add package Swashbuckle.AspNetCore </p>
+<pre><code class="language-json">
+appSettings.Develeopment.json
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },"Jwt": {
+    "SecretKey": "v@Cc1nE!Pr0jeKt2025_T0ken_S3cretKey_X",
+    "Issuer": "BurcuSozayApp",
+    "Audience": "BurcuSozay",
+    "AccessTokenExpirationMinutes": 15,
+    "RefreshTokenExpirationDays": 7
+  },
+  "ConnectionStrings": {
+    "PostgresConnection": "Host=localhost;Database=vaccinedb;Username=postgres;Password=1234qqq"
+  },"Redis": {
+    "ConnectionString": "localhost:6379", // Redis sunucunuza göre ayarlayın
+    "InstanceName": "VaccineCache:"
+  },"AllowedOrigins": "http://localhost:3000,https://localhost:44395"
+}
+</code></pre>
