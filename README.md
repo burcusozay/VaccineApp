@@ -68,7 +68,7 @@
 
 ## React 
 <p>Cmd console > npx create-react-app examapp (If does not work instructions should be done below)</p>
-- npm cache clean –force
-- npm install -g npm@latest
-- npm install -g create-react-app
+1. npm cache clean –force
+2. npm install -g npm@latest
+3. npm install -g create-react-app
 
