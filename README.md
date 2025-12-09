@@ -88,4 +88,31 @@
 <p> - rm package-lock.json -fo </p>
 <p> - npm install react-scripts@latest </p>
 
+## Migration NpgSQL Code First
+
+<strong><p> Eğer migrationdan önce bir hata alınırsa mutlaka bunu çalıştır. </p> </strong>
+<p>	dotnet tool install --global dotnet-ef  </p>
+
+<strong><p>Aşağıdaki 2 işlem .snl root dizininde yapılacak </p></strong>
+<p>dotnet ef migrations add InitialCodeFirstMigration --context AppDbContext --project VaccineApp.Data/VaccineApp.Data.csproj --startup-project VaccineApp.WebAPI/VaccineApp.WebAPI.csproj </p>
+
+<p>dotnet ef database update --project VaccineApp.Data/VaccineApp.Data.csproj --startup-project VaccineApp.WebAPI/VaccineApp.WebAPI.csproj  </p>
+
+<strong><p>	Eğer Migration silinmesi gerekirse bu işlem yine .snl root dizininde yapılacak. Sonra yukarıdaki işlemleri tekrar yap.  </p></strong>
+<p>dotnet ef migrations remove --project VaccineApp.Data/VaccineApp.Data.csproj --startup-project VaccineApp.WebAPI/VaccineApp.WebAPI.csproj  </p>
+
+<strong><p>Eğer aynı csproj içinde migration yapılacaksa bunları yap  </p></strong>
+<p>dotnet ef migrations add InitialCodeFirstMigration --context AppDbContext  </p>
+<p>dotnet ef database update --context AppDbContext  </p>
+
+<p>Enable-Migrations</p>
+<p>add-migration EmptyMigration</p>
+<p>update-database</p>
+
+<p> Daha sonra seed işlemi için uygulama ayağa kaldırılır.   </p>
+
+## Migration NpgSQL DB First
+<p> Eğer hazırda bir db varsa ve buradan entity modeller yaratılacaksa bu komut kullanılır.  Eğer public adında bir şema yok derse db export import yapmak lazım.  </p>
+<p> dotnet tool install --global dotnet-ef 	 </p>
+<p> dotnet ef dbcontext scaffold "Host=localhost;Database=vaccinedb;Username=postgres;Password=1234qqq" Npgsql.EntityFrameworkCore.PostgreSQL --output-dir Context --context AppDbContext --no-onconfiguring --force –verbose --use-database-names  </p>
 
