@@ -71,4 +71,17 @@
 <p>1. npm cache clean –force </p>
 <p>2. npm install -g npm@latest </p>
 <p>3. npm install -g create-react-app </p>
+<p>npm install react-router-dom </p>
+<p>npm install react-bootstrap </p>
+<p>npm i @material-ui/core --legacy-peer-deps </p>
+<p>npm config set legacy-peer-deps true (eğer dependency hatası verirse)  </p>
+<p>npm install react-router-dom </p>
+<p>npm install axios  </p>
+<p>npm install jwt-decode </p>
+<p>npm install ajv ajv-keywords (burada hangi paketse)  </p>
+<p>npm install @mui/material @emotion/react @emotion/styled </p>
+<p>npm install </p>
+<p>npm start </p> 
+<p>npm ls {package-name} (burası dependency listesini verir)</p>
+
 
