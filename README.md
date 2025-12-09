@@ -83,5 +83,9 @@
 <p>npm install </p>
 <p>npm start </p> 
 <p>npm ls {package-name} (burası dependency listesini verir)</p>
+<p>Eğer uygulama oluşturulduktan sonra dependency hatası alınırsa şu komutlar yapılacak 
+<p> - rm node_modules -r -fo </p>
+<p> - rm package-lock.json -fo </p>
+<p> - npm install react-scripts@latest </p>
 
 
