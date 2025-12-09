@@ -65,3 +65,10 @@
 
 ## Fluent Validation
 <p>dotnet add package FluentValidation.AspNetCore (ModelView.proj and WebAPI.proj)</p>
+
+## React 
+<p>Cmd console > npx create-react-app examapp (If does not work instructions should be done below)</p>
+- npm cache clean –force
+- npm install -g npm@latest
+- npm install -g create-react-app
+
