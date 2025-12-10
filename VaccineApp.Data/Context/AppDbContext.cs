@@ -109,9 +109,7 @@ public partial class AppDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("Vaccines_pk"); 
             entity.HasIndex(e => e.Id, "VaccinesId_idx");
-
-            entity.Property(e => e.Id).UseIdentityAlwaysColumn();
-
+             
             entity.Property(e => e.Id).UseIdentityAlwaysColumn();
             entity.Property(e => e.CompanyName).HasColumnType("character varying");
             entity.Property(e => e.Name).HasColumnType("character varying");
@@ -188,5 +186,6 @@ public partial class AppDbContext : DbContext
         OnModelCreatingPartial(modelBuilder);
     }
 
+        
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }

@@ -8,6 +8,7 @@ using VaccineApp.ViewModel.Worker;
 
 namespace VaccineApp.SoketListener
 {
+    // Soket yayýnýndan gelen mesajý rabbitMQ'da kuyruða atar
     public class SoketListenerWorker : BackgroundService
     {
         private readonly ILogger<SoketListenerWorker> _logger;

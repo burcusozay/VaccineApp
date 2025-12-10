@@ -12,6 +12,7 @@ using VaccineApp.ViewModel.Worker;
 
 namespace VaccineApp.RabbitMqConsumer
 {
+    // RabbitMQ kuyruðundan mesajlarý dinler ve iþleme alýr
     public class RabbitMqConsumerWorker : BackgroundService
     {
         private readonly ILogger<RabbitMqConsumerWorker> _logger;

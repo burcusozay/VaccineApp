@@ -11,6 +11,7 @@ using VaccineApp.OutboxPublisher.Options;
 using VaccineApp.ViewModel.Dtos;
 using VaccineApp.ViewModel.Enums;
 
+// Bu servis veritabanýnda 5 kez baþarýsýz kayýt olmasý halinde api url e bilgilendirme gönderir. Notification iþlemi yapar
 public class OutboxPublisherWorker : BackgroundService
 {
     private readonly IHttpClientFactory _httpClientFactory;
